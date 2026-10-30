@@ -1,60 +1,93 @@
 <p align="center">
-  <img src="docs/demo.gif" alt="The word Growth with blue vines climbing its letters and red roses swaying" width="720">
+  <img src="assets/icon.png" width="128" height="128" alt="BloomType app icon: six rose-red petals on a dark glass tile">
 </p>
 
-# BloomType
+<h1 align="center">BloomType <sub>by Jericho</sub></h1>
 
-Type a word. A garden grows around it.
+<p align="center">
+  Type a word. A garden grows around it.<br>
+  Vines climb the letters, flowers open, and the whole poster loops — ready for a reel or your website.
+</p>
 
-**[Open BloomType](https://msreeganeshnaik.github.io/BloomType/)**
+<p align="center">
+  <a href="https://msreeganeshnaik.github.io/BloomType/"><b>Open BloomType</b></a>
+</p>
 
-BloomType turns any word into a living poster. Vines climb the letterforms, roses open, petals fall. Pick a garden, a typeface, a motion and a palette, then export a seamless loop for social, or drop the poster straight into a website as code.
+<p align="center">
+  <img src="assets/demo.gif" width="100%" alt="The word Growth on a cream poster. Blue vines climb around its letters, weaving over and under the strokes, and red swirl roses sway in a seamless loop.">
+</p>
 
-![The BloomType editor: controls on the left, the word Growth wrapped in climbing roses on the right](docs/preview.png)
+## Try it
+
+Open **[msreeganeshnaik.github.io/BloomType](https://msreeganeshnaik.github.io/BloomType/)**. It runs in your browser: no install, no account, no upload.
+
+## How it works
+
+| You | BloomType |
+|---|---|
+| Type a word | Vines sprout from each letter's own outline, climb it like ivy and weave over and under its strokes |
+| Pick a garden | Roses, tulips, daisies, wisteria, blossom, or a mix of all of them |
+| Drag **Intensity** | The garden fills in from a few sprigs to overgrown, live, as you drag |
+| Press **Regrow garden** | A new random garden at the same intensity, every time |
+| Pick a motion, typeface and palette | The poster changes instantly and keeps looping |
+| Export | A seamless MP4, every frame as PNG, a still, an HTML page or embed code for your site |
+
+<p align="center">
+  <img src="assets/preview.png" width="100%" alt="The BloomType editor. A dark panel on the left holds the word, Regrow garden, the Intensity slider, six garden cards, six typefaces and the motions. On the right the word Growth is wrapped in climbing blue vines and red roses.">
+</p>
 
 ## Gardens
 
-![The word Bloom in six gardens: roses, tulips, daisies, wisteria, blossom and a mixed garden](docs/styles.png)
+<p align="center">
+  <img src="assets/styles.png" width="100%" alt="The word Bloom in six gardens: roses on black, tulips on butter yellow, daisies on navy, wisteria on cream, blossom on moss green and a mixed garden on dark green.">
+</p>
 
 | Garden | What grows |
-| --- | --- |
-| **Roses** | Ivy that climbs each letter's outline and weaves over and under its strokes, with swirl roses, buds and corkscrew tendrils |
-| **Tulips** | The same climbing vines, crowned with cupped tulips facing along the stem |
+|---|---|
+| **Roses** | Climbing vines with swirl roses, buds and corkscrew tendrils |
+| **Tulips** | The same climbing vines, crowned with cupped tulips that face along the stem |
 | **Daisies** | Climbing vines with open daisies |
 | **Wisteria** | Climbing vines with flower clusters that hang and swing |
-| **Blossom** | Angular branches with clusters of five-petal blossom; petals drift down in every motion |
-| **Mixed** | Roses, tulips, daisies, poppies and wisteria in one garden |
+| **Blossom** | Angular branches with clusters of five-petal blossom, and petals that fall in every motion |
+| **Mixed** | Roses, tulips, daisies, poppies and wisteria together |
 
-## Controls
+## Motions
 
-- **Words**: up to 16 characters. Click the poster to type straight onto it.
-- **Regrow garden** (`R`): a new random layout every time.
-- **Intensity**: how full the garden is, from a few sprigs to overgrown. Regrow stays random but lands near the level you set.
-- **Typeface**: Newsreader, Playfair Display, Instrument Serif, Fraunces, Bricolage Grotesque, Pinyon Script. Switching face re-sprouts the garden from the new letter shapes.
-- **Motion**: Static, Breathe (3s), Grow & wither (6s), Typed (5s), Gust (4s), Reach (6s, stems follow your cursor in the editor), Scatter (6s), Visitor (7s).
-- **Palette**: Rose noir, Paper, Midnight, Citrus, Orchid, Moss, Tomato, Butter.
-- **Shortcuts**: `Space` play or pause, `R` regrow, `\` hide the panel.
+| Motion | What happens | Loop |
+|---|---|---|
+| **Static** | A still poster | — |
+| **Breathe** | Stems sway and flowers breathe | 3s |
+| **Grow & wither** | The garden grows in, blooms, then pulls back | 6s |
+| **Typed** | The word types itself out, is cut, and starts again | 5s |
+| **Gust** | A gust sweeps across and petals fly | 4s |
+| **Reach** | Stems lean toward a moving light; in the editor it follows your cursor | 6s |
+| **Scatter** | Flowers bloom and fade at random | 6s |
+| **Visitor** | A butterfly flies in, rests on a flower and flies off | 7s |
+
+Every loop is seamless: the last frame flows straight into the first.
+
+**Typefaces:** Newsreader, Playfair Display, Instrument Serif, Fraunces, Bricolage Grotesque and Pinyon Script. Switching typeface re-grows the garden from the new letter shapes.
+
+**Palettes:** Rose noir, Paper, Midnight, Citrus, Orchid, Moss, Tomato and Butter.
 
 ## Export
 
 | Format | What you get |
-| --- | --- |
-| **MP4** | H.264 at 30 fps, one seamless loop, encoded frame by frame in the browser |
+|---|---|
+| **MP4** | H.264 at 30 fps, one seamless loop, rendered frame by frame |
 | **PNG frames** | Every frame of the loop, zipped |
 | **Still PNG** | The frame on screen |
-| **HTML file** | A standalone page that draws the poster live at any size |
+| **HTML file** | A standalone page that draws the poster live, sharp at any size |
 | **Embed code** | An HTML snippet or a React component for your own site |
 
-Ratios: **Full** (exactly what you see), **1:1**, **4:5**, **9:16** and **16:9**. Each ratio recomposes the poster for its frame, so nothing gets cropped. The transparent-background switch applies to PNG, HTML and embed exports.
+Pick the ratio when you export: **Full** (exactly what you see), **1:1**, **4:5**, **9:16** or **16:9**. Each ratio re-composes the poster for its frame, so nothing is ever cropped. Turn on **Transparent background** to lay a PNG, HTML page or embed over your own design.
 
-MP4 export uses WebCodecs (current Chrome, Edge and Safari). Browsers without it record a WebM instead.
+### Put it on your website
 
-### Put it on a website
+Open **Export → Embed code**, choose **HTML** or **React**, and press **Copy code**.
 
-Open **Export → Embed code**, choose **HTML** or **React**, and copy.
-
-- **Webflow, Framer, WordPress or plain HTML**: paste the HTML snippet into an embed or custom HTML block. It scales to its box, pauses when scrolled off screen and holds a still frame for visitors who prefer reduced motion.
-- **React or Next.js**: save the code as `BloomTypePoster.jsx`, then render it:
+- **Webflow, Framer, WordPress or plain HTML:** paste the snippet into an embed or custom HTML block. It scales to its box, pauses when it scrolls off screen, and holds a still frame for visitors who prefer reduced motion.
+- **React or Next.js:** save it as `BloomTypePoster.jsx` and render it:
 
 ```jsx
 import BloomTypePoster from "./BloomTypePoster";
@@ -64,30 +97,44 @@ export default function Hero() {
 }
 ```
 
-The snippet is self-contained (about 40 KB) and only loads its typeface from Google Fonts.
+The snippet is self-contained (about 40 KB) and only fetches its typeface from Google Fonts.
 
-## How it works
+## Private by design
 
-- The poster is a pure function of word, seed, garden, typeface, palette, motion, frame size and time. Every moving part is periodic in the loop, so exports loop with no seam.
-- Each glyph is rasterised into a signed distance field. Stems follow the letter's outline at a small offset, peel away, then curl. A stem switches layer every time it enters a stroke, which gives the over-and-under weave.
-- Plants are seeded per letter, so typing a new letter grows only that letter's garden.
-- Exports render offline, frame by frame, never in real time: [WebCodecs](https://developer.mozilla.org/docs/Web/API/WebCodecs_API) with [mp4-muxer](https://github.com/Vanilagy/mp4-muxer) for video, [fflate](https://github.com/101arrowz/fflate) for zips. Both load only when you export.
-- One HTML file. No build step, no framework.
+BloomType has no server, no account and no analytics. Your word is drawn in your browser and never leaves it. The only outside requests are Google Fonts for the typefaces and, when you export a video or a zip, two small libraries from jsDelivr.
 
-## Run it locally
+## Shortcuts
 
-Open `index.html` in a browser, or serve the folder:
+| Key | Does |
+|---|---|
+| <kbd>Space</kbd> | Play or pause |
+| <kbd>R</kbd> | Regrow the garden |
+| <kbd>\\</kbd> | Hide or show the panel |
 
-```sh
-npx serve .
+## Build from source
+
+```bash
+git clone https://github.com/MSreeGaneshNaik/BloomType.git
+cd BloomType
+npx serve .            # or just open index.html in a browser
 ```
 
-## Hosting
+There is no build step and no framework — one HTML file, about 1,300 lines.
 
-The site is served by GitHub Pages from the `main` branch root (**Settings → Pages → Deploy from a branch → `main` / root**). `.nojekyll` keeps Pages from processing the files.
+| File | What it does |
+|---|---|
+| [`index.html`](index.html) | The whole app. `<script id="bloom-engine">` is the engine: letter outlines as distance fields, climbing growth, the flowers, the motions and the renderer. The script after it is the editor: the panel, the live preview and every export. The engine is also what the HTML file and embed code ship. |
+| [`assets/`](assets) | The icon and the images in this README |
+| [`.nojekyll`](.nojekyll) | Tells GitHub Pages to serve the files as they are |
+
+## Good to know
+
+- Words can be up to 16 characters. Emoji are not allowed.
+- Your last word, garden and settings are remembered in your browser.
+- MP4 export needs WebCodecs (current Chrome, Edge, Safari and Firefox). Browsers without it record a WebM instead.
+- Lighthouse, measured locally: Performance 95+ on mobile and 100 on desktop; Accessibility, Best Practices and SEO 100.
+- Hosted on GitHub Pages from the `main` branch.
 
 ## Credits
 
-Inspired by a reel of [type-garden.vercel.app](https://type-garden.vercel.app). BloomType is an independent rebuild written from scratch from the video; no code from the original was used.
-
-Typefaces from [Google Fonts](https://fonts.google.com). Export libraries mp4-muxer and fflate (both MIT) load from jsDelivr.
+BloomType is made by Jericho, and the petal mark is Jericho's. The idea of flowers growing around typed words was inspired by Type Garden. BloomType is an independent, from-scratch implementation; no code from Type Garden was used. Typefaces come from Google Fonts, and the MP4 and zip exports use mp4-muxer and fflate (both MIT).
