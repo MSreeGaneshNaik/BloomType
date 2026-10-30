@@ -14,13 +14,16 @@ BloomType turns any word into a living poster. Vines climb the letterforms, rose
 
 ## Gardens
 
-![The word Bloom in three gardens: climbing roses on black, blossom branches on navy, a meadow of poppies on butter yellow](docs/styles.png)
+![The word Bloom in six gardens: roses, tulips, daisies, wisteria, blossom and a mixed garden](docs/styles.png)
 
 | Garden | What grows |
 | --- | --- |
 | **Roses** | Ivy that climbs each letter's outline and weaves over and under its strokes, with swirl roses, buds and corkscrew tendrils |
+| **Tulips** | The same climbing vines, crowned with cupped tulips facing along the stem |
+| **Daisies** | Climbing vines with open daisies |
+| **Wisteria** | Climbing vines with flower clusters that hang and swing |
 | **Blossom** | Angular branches with clusters of five-petal blossom; petals drift down in every motion |
-| **Meadow** | Grass tufts, daisies and poppies rising from the base of the word |
+| **Mixed** | Roses, tulips, daisies, poppies and wisteria in one garden |
 
 ## Controls
 

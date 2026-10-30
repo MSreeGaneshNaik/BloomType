@@ -288,10 +288,16 @@ const MOTIONS = [
 const STYLES = [
   { id:'rose',    name:'Roses',   desc:'Climbing vines', noun:'roses',
     icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M4 30c6-2 7-10 13-12s9 4 14-1" stroke="#97A6F4" stroke-width="1.6" stroke-linecap="round"/><path d="M17 18c-1-3 1-5 3-4" stroke="#97A6F4" stroke-width="1.4" stroke-linecap="round"/><circle cx="32" cy="14" r="6" fill="#F3675B"/><path d="M31 14a1.6 1.6 0 1 1 2 1.5c-1.6.5-3-.6-3-2.2" stroke="#FFD6CB" stroke-width="1.1" stroke-linecap="round"/></svg>' },
+  { id:'tulip',   name:'Tulips',  desc:'Cupped heads', noun:'tulips',
+    icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M20 33c0-6-1-11 0-16" stroke="#97A6F4" stroke-width="1.6" stroke-linecap="round"/><path d="M20 27c-5-1-8-4-9-8 4 0 8 2 9 8z" fill="#97A6F4"/><path d="M13 5l2.5 5L20 4l4.5 6L27 5c1.5 6 0 11-7 12-7-1-8.5-6-7-12z" fill="#F3675B"/></svg>' },
+  { id:'daisy',   name:'Daisies', desc:'Sunny rays', noun:'daisies',
+    icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M20 33c-1-6 0-12 0-18" stroke="#97A6F4" stroke-width="1.6" stroke-linecap="round"/><g fill="#F3675B" transform="translate(20 11)"><ellipse rx="1.8" ry="4.6" cy="-5"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(45)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(90)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(135)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(180)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(225)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(270)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(315)"/></g><circle cx="20" cy="11" r="3" fill="#FFD6CB"/></svg>' },
+  { id:'wisteria',name:'Wisteria',desc:'Hanging clusters', noun:'clusters',
+    icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M3 6c8 3 14-2 22 1s9 0 12-2" stroke="#97A6F4" stroke-width="1.6" stroke-linecap="round"/><g fill="#F3675B"><circle cx="14" cy="10" r="2.6"/><circle cx="12.5" cy="14.5" r="2.3"/><circle cx="14.5" cy="18.6" r="2"/><circle cx="13" cy="22.4" r="1.6"/><circle cx="14" cy="25.8" r="1.2"/><circle cx="29" cy="10" r="2.4"/><circle cx="30.4" cy="14.2" r="2"/><circle cx="29" cy="18" r="1.6"/></g><g fill="#FFD6CB"><circle cx="13.6" cy="28.6" r=".9"/><circle cx="30" cy="21.2" r="1"/></g></svg>' },
   { id:'blossom', name:'Blossom', desc:'Petals fall', noun:'blossoms',
     icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M3 29l9-5 6 1 7-8 5-1 6-6M18 25l3-7" stroke="#97A6F4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><g fill="#F3675B"><circle cx="30" cy="11" r="3"/><circle cx="35" cy="9" r="2.4"/><circle cx="21" cy="16" r="2.6"/></g><circle cx="12" cy="9" r="1.6" fill="#F3675B" opacity=".8"/></svg>' },
-  { id:'meadow',  name:'Meadow',  desc:'Wild blooms', noun:'flowers',
-    icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M6 32c1-6 0-9-2-12M10 32c0-5 2-8 4-10M20 32c0-8-1-14-2-20M30 32c0-6 2-12 3-16" stroke="#97A6F4" stroke-width="1.5" stroke-linecap="round"/><g fill="#F3675B"><circle cx="18" cy="9" r="4.4"/><circle cx="33" cy="13" r="3.4"/></g><circle cx="18" cy="9" r="1.6" fill="#FFD6CB"/><circle cx="33" cy="13" r="1.2" fill="#0C1A4C"/></svg>' },
+  { id:'mix',     name:'Mixed',   desc:'A bit of all', noun:'flowers',
+    icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M5 31c5-3 7-9 12-11s10 2 15-3" stroke="#97A6F4" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="13" r="4.5" fill="#F3675B"/><path d="M24 9l1.5 3.5 3.5-4 3.5 4L34 9c.5 4-.5 7-5 7.5-4.5-.5-5.5-3.5-5-7.5z" fill="#F3675B"/><g fill="#FFD6CB"><circle cx="31" cy="21" r="1.7"/><circle cx="30" cy="25" r="1.3"/><circle cx="31" cy="28.4" r=".9"/></g></svg>' },
 ];
 const FONTS = [
   { id:'newsreader', name:'Newsreader',   family:'Newsreader',          weight:400, fb:'Georgia, serif' },
@@ -460,7 +466,7 @@ function genRosePlant(r, F){
       wav:{ a1:wav.a1*0.6, f1:wav.f1*1.3, p1:r()*TAU, a2:wav.a2*0.5, f2:wav.f2, p2:r()*TAU, bend:wav.bend }, curl:bEnd==='curl', end:bEnd, fl:genRose(r,false), leaves:{} })); }
   const nt = r() < 0.6 ? 1 + (r() < 0.35 ? 1 : 0) : 0;           // little corkscrew tendrils
   for (let t=0;t<nt;t++) twigs.push(addTwig(F, r, main, lay, { at:Math.floor(N*(0.25+r()*0.6)), angle:0.7+r()*0.6, len:3+(r()*5|0), step:step*0.8, wav:wavParams(r,0.5), curl:true, end:'curl', thin:true }));
-  return { kind:'rose', main, lay, twigs, end, fl:genRose(r,true), leaves:genLeaves(r, main.stem), blooms:[], grass:[], ph:r()*TAU, delay:r(), sph:r(), wMul:1 };
+  return { kind:'rose', main, lay, twigs, end, fl:genRose(r,true), leaves:genLeaves(r, main.stem), blooms:[], ph:r()*TAU, delay:r(), sph:r(), wMul:1 };
 }
 
 /* ---------- Blossom: angular branches, clustered five-petal flowers ---------- */
@@ -476,36 +482,26 @@ function genBlossomPlant(r, F){
   for (let c=0;c<clusters;c++){ const i = Math.floor(N*(0.3+r()*0.7)); const m = 1+(r()*3|0);
     for (let j=0;j<m;j++) blooms.push({ on:-1, i, dx:(r()-.5)*0.11, dy:(r()-.5)*0.11, kind:r()<0.8?'sakura':'sbud', fl:genSakura(r, 0.9), sph:r() }); }
   twigs.forEach((tw, ti) => { const m = r()<0.7 ? 1+(r()*2|0) : 0; for (let j=0;j<m;j++) blooms.push({ on:ti, i:tw.stem-1, dx:(r()-.5)*0.1, dy:(r()-.5)*0.1, kind:r()<0.75?'sakura':'sbud', fl:genSakura(r,0.85), sph:r() }); });
-  return { kind:'blossom', main, lay, twigs, end:'sakura', fl:genSakura(r,1.15), leaves:genLeaves(r, main.stem, { start:6, len:0.05, lenR:0.03, gap:9, wid:0.36 }), blooms, grass:[], ph:r()*TAU, delay:r(), sph:r(), wMul:2.1 };
-}
-
-/* ---------- Meadow: grass tufts and wildflowers rising from the letters ---------- */
-function genMeadowPlant(r, F){
-  const q = pick(r, F.ink, 16, p => p[1]), step = 0.026, N = 14 + (r()*50|0);
-  const wav = { a1:0.08+r()*0.16, f1:0.05+r()*0.06, p1:r()*TAU, a2:0.03+r()*0.05, f2:0.2+r()*0.2, p2:r()*TAU, bend:(r()-.5)*0.012 };
-  const x = r(), end = x<0.42 ? 'daisy' : x<0.74 ? 'poppy' : x<0.86 ? 'bud' : 'none';
-  const main = growPath(F, [q[0],q[1]], -Math.PI/2 + (r()-.5)*0.75, N, step, wav, {}, r);
-  const lay = weave(F, main.pts, r()<0.35 ? 1 : 0), twigs = [];
-  if (N > 30 && r() < 0.35){ const e2 = r()<0.6 ? 'daisy' : 'bud';
-    twigs.push(addTwig(F, r, main, lay, { at:Math.floor(N*(0.35+r()*0.3)), angle:0.3+r()*0.35, len:8+(r()*12|0), step, wav:{ ...wav, p1:r()*TAU }, end:e2, fl:{ R:0.06+r()*0.035, n:11+(r()*5|0), spin:r()*TAU } })); }
-  const grass = []; const nb = 2 + (r()*4|0);
-  for (let b=0;b<nb;b++) grass.push({ dx:(r()-.5)*0.18, h:0.06+Math.pow(r(),1.6)*0.22, lean:(r()-.5)*1.2, w:0.018+r()*0.012, ph:r()*TAU });
-  return { kind:'meadow', main, lay, twigs, end, fl:{ R:0.075+r()*0.06, n:11+(r()*6|0), spin:r()*TAU }, leaves:genLeaves(r, main.stem, { start:2, len:0.16, lenR:0.1, gap:7, wid:0.16, ang:0.25, until:Math.max(6, main.stem*0.5) }), blooms:[], grass, ph:r()*TAU, delay:r(), sph:r(), wMul:0.8 };
+  return { kind:'blossom', main, lay, twigs, end:'sakura', fl:genSakura(r,1.15), leaves:genLeaves(r, main.stem, { start:6, len:0.05, lenR:0.03, gap:9, wid:0.36 }), blooms, ph:r()*TAU, delay:r(), sph:r(), wMul:2.1 };
 }
 
 /* Plants per letter: a seeded pool, of which a random-density share is shown. */
 const plantCache = new Map();
+const VINE_FLOWERS = ['flower','tulip','daisy','poppy','wisteria'];   // 'flower' is the rose
 const plantKey = (ch, k) => [S.seed, S.style, S.font, k, ch].join('|');
 function lettersPlants(ch, k){
   const key = plantKey(ch, k);
   if (plantCache.has(key)) return plantCache.get(key);
   const F = glyphField(ch), r = mulberry32(hash(S.seed, S.style, k, ch)), out = { plants:[], bias:r() };
-  if (!F.empty){ const gen = S.style==='blossom' ? genBlossomPlant : S.style==='meadow' ? genMeadowPlant : genRosePlant;
-    for (let p=0;p<8;p++) out.plants.push(gen(r, F)); }
+  if (!F.empty){ const gen = S.style==='blossom' ? genBlossomPlant : genRosePlant;
+    for (let p=0;p<8;p++) out.plants.push(gen(r, F));
+    if (S.style!=='rose' && S.style!=='blossom'){ const rk = mulberry32(hash(S.seed, 'kind', k, ch));
+      const head = () => S.style==='mix' ? VINE_FLOWERS[(rk()*VINE_FLOWERS.length)|0] : S.style;
+      for (const pl of out.plants){ if (pl.end==='flower') pl.end = head(); for (const tw of pl.twigs) if (tw.end==='flower') tw.end = head(); } } }
   plantCache.set(key, out); return out;
 }
 function plantCount(n, bias){
-  const styleK = S.style==='meadow' ? 1.35 : S.style==='blossom' ? 0.8 : 1;
+  const styleK = S.style==='blossom' ? 0.8 : 1;
   const base = clamp(14/Math.max(n,2), 1, 4.2) * S.density * styleK;
   return clamp(Math.round(base*(0.55 + bias*0.9)), 0, 8);
 }
@@ -519,7 +515,7 @@ function looseBlooms(W,H){
 const mcv = document.createElement('canvas'), mctx = mcv.getContext('2d');
 let layoutCache = null;
 function layout(W,H){
-  const key = [S.word, S.font, S.style, W, H, fontsReady].join('|');
+  const key = [S.word, S.font, W, H, fontsReady].join('|');
   if (layoutCache && layoutCache.key===key) return layoutCache;
   const word = S.word || ' ';
   mctx.font = fontCss(100);
@@ -528,8 +524,7 @@ function layout(W,H){
   mctx.font = fontCss(fs);
   const tw = mctx.measureText(word).width, off = [];
   for (let k=0;k<=word.length;k++) off.push(mctx.measureText(word.slice(0,k)).width);
-  // a meadow grows upward, so the word sits lower to give the flowers sky
-  layoutCache = { key, fs, x0:(W-tw)/2, base:H*0.5 + fs*(S.style==='meadow' ? 0.62 : 0.3), off, tw, font:fontCss(fs) };
+  layoutCache = { key, fs, x0:(W-tw)/2, base:H*0.5 + fs*0.3, off, tw, font:fontCss(fs) };
   return layoutCache;
 }
 
@@ -660,6 +655,26 @@ function drawPoppy(ctx, x,y, R, rot, fl, bloom, P){
   for (let j=0;j<11;j++){ const a=j/11*TAU; ctx.beginPath(); ctx.moveTo(Math.cos(a)*r*0.2, Math.sin(a)*r*0.2); ctx.lineTo(Math.cos(a)*r*0.36*o, Math.sin(a)*r*0.36*o); ctx.stroke(); }
   ctx.restore();
 }
+function drawTulip(ctx, x,y, R, tang, bloom, P){
+  if (bloom <= 0.01) return; const r = R*1.35*bloom, o = clamp((bloom-0.3)/0.7);
+  const cup = s => { ctx.beginPath(); ctx.moveTo(-0.62*r*s, -0.7*r*s); ctx.lineTo(-0.52*r*s, -1.32*r*s);
+    ctx.quadraticCurveTo(-0.26*r*s, -0.98*r*s, 0, -1.42*r*s); ctx.quadraticCurveTo(0.26*r*s, -0.98*r*s, 0.52*r*s, -1.32*r*s);
+    ctx.lineTo(0.62*r*s, -0.7*r*s); ctx.bezierCurveTo(0.62*r*s, 0, -0.62*r*s, 0, -0.62*r*s, -0.7*r*s); ctx.closePath(); };
+  ctx.save(); ctx.translate(x,y); ctx.rotate(tang + Math.PI/2); ctx.scale(0.72 + 0.28*o, 1);
+  ctx.fillStyle = P.shade; for (const a of [-0.24, 0.24]){ ctx.save(); ctx.rotate(a*o); cup(1.04); ctx.fill(); ctx.restore(); }
+  ctx.fillStyle = P.flower; cup(1); ctx.fill();
+  ctx.globalAlpha = 0.7*o; ctx.strokeStyle = P.detail; ctx.lineWidth = Math.max(0.7, r*0.06); ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(0, -0.25*r); ctx.quadraticCurveTo(0.06*r, -0.7*r, 0, -1.05*r); ctx.stroke();
+  ctx.restore();
+}
+function drawWisteria(ctx, x,y, R, swing, bloom, P){
+  if (bloom <= 0.01) return; const n = 16, L = R*3.4, shown = n*clamp(bloom);
+  ctx.save(); ctx.translate(x,y); ctx.rotate(swing*0.6);
+  for (let i=0;i<shown;i++){ const t = i/(n-1), rr = R*(0.34 - t*0.18)*easeOut(clamp(shown - i));
+    ctx.fillStyle = i%3===2 ? P.shade : t > 0.82 ? P.detail : P.flower;
+    ctx.beginPath(); ctx.arc(Math.sin(i*2.3)*R*0.5*(1-t*0.7) + Math.sin(t*Math.PI)*R*0.25, R*0.2 + t*L, Math.max(0.5, rr), 0, TAU); ctx.fill(); }
+  ctx.restore();
+}
 function drawFlower(ctx, kind, x,y, R, tang, extraRot, fl, bloom, P){
   if (kind==='flower' || kind==='rose') drawRose(ctx, x,y, R, tang+extraRot, fl, bloom, P);
   else if (kind==='bud') drawBud(ctx, x,y, R, tang, bloom, P);
@@ -667,8 +682,10 @@ function drawFlower(ctx, kind, x,y, R, tang, extraRot, fl, bloom, P){
   else if (kind==='sbud') drawSakura(ctx, x,y, R, tang, Math.min(bloom, 0.36), P);
   else if (kind==='daisy') drawDaisy(ctx, x,y, R, fl.spin+extraRot, fl, bloom, P);
   else if (kind==='poppy') drawPoppy(ctx, x,y, R, fl.spin+extraRot, fl, bloom, P);
+  else if (kind==='tulip') drawTulip(ctx, x,y, R, tang+extraRot*0.5, bloom, P);
+  else if (kind==='wisteria') drawWisteria(ctx, x,y, R, extraRot, bloom, P);
 }
-const isBloom = k => k==='flower'||k==='rose'||k==='sakura'||k==='daisy'||k==='poppy';
+const isBloom = k => k==='flower'||k==='rose'||k==='sakura'||k==='daisy'||k==='poppy'||k==='tulip'||k==='wisteria';
 
 /* Place a plant's geometry for this frame: displaced points and growth progress. */
 function placePlant(pl, O, fs, M, g){
@@ -690,22 +707,9 @@ function flowerRot(M, ph, x){
   if (M.light) r += 0.15*Math.sin(TAU*M.u + ph);
   return r;
 }
-function drawGrass(ctx, it, M, P){
-  const pl = it.pl, fs = M.fs, root = it.D[0], gg = easeOut(clamp(it.g*1.5));
-  ctx.fillStyle = P.vine;
-  for (const b of pl.grass){ const h = b.h*fs*gg; if (h < 1) continue;
-    const bx = root[0] + b.dx*fs, by = root[1] + fs*0.015, tx0 = bx + b.lean*h*0.45, ty0 = by - h;
-    const d = displace(tx0, ty0, 1, 0, 1, pl.ph + b.ph, M), k = h/(fs*0.4);
-    const tx = tx0 + d[0]*k, ty = ty0 + d[1]*k, w = b.w*fs;
-    ctx.beginPath(); ctx.moveTo(bx - w/2, by);
-    ctx.quadraticCurveTo(bx + (tx-bx)*0.2 - w*0.15, by - h*0.55, tx, ty);
-    ctx.quadraticCurveTo(bx + (tx-bx)*0.2 + w*0.45, by - h*0.5, bx + w/2, by);
-    ctx.fill(); }
-}
 function drawPlant(ctx, it, M, P, pass, spots){
   const { pl, D } = it, fs = M.fs, w = Math.max(1, fs*0.013*pl.wMul), lay = pl.lay;
   ctx.strokeStyle = P.vine; ctx.lineCap='round'; ctx.lineJoin='round';
-  if (pl.grass.length && lay[0]===pass) drawGrass(ctx, it, M, P);
   if (it.visMain <= 0) return;
   // stem, tapered toward the tip
   if (pl.kind==='blossom'){ ctx.lineWidth = w*0.38; strokeRuns(ctx, D, it.visMain, lay, pass);
@@ -843,9 +847,10 @@ function render(ctx, W, H, u, live, now, transparent){
   if (M.id==='scatter'){
     for (const b of looseBlooms(W,H)){ const bl = scatterBloom(b.ph, u); if (bl<=0) continue;
       const x=b.x*W, y=b.y*H;
-      if (S.style==='blossom') drawSakura(ctx, x, y, b.sk.R*fs, b.sk.spin, bl, P);
-      else if (S.style==='meadow') drawDaisy(ctx, x, y, b.fl.R*fs*0.9, b.fl.spin, b.fl, bl, P);
-      else { drawLeaf(ctx, x, y, b.leaf, b.fl.R*fs*1.6*clamp(bl), 0.34, P); drawRose(ctx, x, y, b.fl.R*fs, Math.sin(TAU*u+b.ph*TAU)*0.1, b.fl, bl, P); } }
+      if (S.style==='blossom'){ drawSakura(ctx, x, y, b.sk.R*fs, b.sk.spin, bl, P); continue; }
+      const kind = S.style==='mix' ? VINE_FLOWERS[(b.ph*VINE_FLOWERS.length)|0] : S.style==='rose' ? 'flower' : S.style;
+      drawLeaf(ctx, x, y, b.leaf, b.fl.R*fs*1.6*clamp(bl), 0.34, P);
+      drawFlower(ctx, kind, x, y, b.fl.R*fs, -Math.PI/2, Math.sin(TAU*u+b.ph*TAU)*0.1, b.fl, bl, P); }
   }
   const spots = [];
   for (const it of items) drawPlant(ctx, it, M, P, 0, spots);
@@ -871,6 +876,7 @@ function persist(){ try { localStorage.setItem('bloomtype.v2', JSON.stringify(S)
 
 /* Intensity sets the garden's fullness; each regrow adds a little randomness around it. */
 if (typeof S.intensity !== 'number') S.intensity = 0.45;
+if (!STYLES.some(x => x.id === S.style)) S.style = 'rose';   // e.g. a saved 'meadow' from an older version
 if (typeof S.jitter !== 'number') S.jitter = 1;
 function densityOf(){ return +(lerp(0.3, 2.4, Math.pow(S.intensity, 1.1)) * S.jitter).toFixed(3); }
 S.density = densityOf();
@@ -915,11 +921,10 @@ function updateStats(){
   const n = S.word.length; let plants=0, flowers=0, buds=0, curls=0, leaves=0;
   const tally = k => { if (isBloom(k)) flowers++; else if (k==='bud'||k==='sbud') buds++; else if (k==='curl') curls++; };
   for (let k=0;k<n;k++){ const lp = lettersPlants(S.word[k], k), want = plantCount(n, lp.bias);
-    for (let p=0;p<Math.min(want, lp.plants.length);p++){ const pl = lp.plants[p]; plants++; leaves += pl.leaves.length + pl.grass.length; tally(pl.end);
+    for (let p=0;p<Math.min(want, lp.plants.length);p++){ const pl = lp.plants[p]; plants++; leaves += pl.leaves.length; tally(pl.end);
       for (const tw of pl.twigs){ leaves += tw.leaves.length; tally(tw.end); } for (const b of pl.blooms) tally(b.kind); } }
-  const leafNoun = S.style==='meadow' ? 'leaves & blades' : 'leaves';
   document.getElementById('stats').innerHTML =
-    `<span><b>${plants}</b> plants</span><span><b>${flowers}</b> ${STY().noun}</span><span><b>${buds}</b> buds</span><span><b>${leaves}</b> ${leafNoun}</span>${curls?`<span><b>${curls}</b> tendrils</span>`:''}`;
+    `<span><b>${plants}</b> plants</span><span><b>${flowers}</b> ${STY().noun}</span><span><b>${buds}</b> buds</span><span><b>${leaves}</b> leaves</span>${curls?`<span><b>${curls}</b> tendrils</span>`:''}`;
 }
 
 /* ---------- intensity meter ---------- */
