@@ -737,7 +737,7 @@ function placePlant(pl, O, fs, M, g){
   const n = pl.main.pts.length, D = new Array(n);
   for (let i=0;i<n;i++){ const p=pl.main.pts[i], nr=pl.main.nr[i]; const px=O[0]+p[0]*fs, py=O[1]+p[1]*fs;
     const d = displace(px,py,nr[0],nr[1], i/(n-1), pl.ph, M); D[i]=[px+d[0],py+d[1]]; }
-  const out = { pl, D, g, visMain: clamp(g/0.72)*(n-1), endBloom: easeBack(clamp((g-0.66)/0.34)), T:[] };
+  const out = { pl, D, g, O, visMain: clamp(g/0.72)*(n-1), endBloom: easeBack(clamp((g-0.66)/0.34)), T:[] };
   for (const tw of pl.twigs){ const m = tw.pts.length, E = new Array(m), base = D[tw.b], b0 = [O[0]+tw.pts[0][0]*fs, O[1]+tw.pts[0][1]*fs];
     for (let j=0;j<m;j++){ const p=tw.pts[j], nr=tw.nr[j]; const px=O[0]+p[0]*fs, py=O[1]+p[1]*fs;
       const d = displace(px,py,nr[0],nr[1], (j/Math.max(1,m-1))*0.7, pl.ph+1.3, M);
@@ -754,6 +754,8 @@ function flowerRot(M, ph, x){
 }
 function drawPlant(ctx, it, M, P, pass, spots){
   const { pl, D } = it, fs = M.fs, w = Math.max(1, fs*0.013*pl.wMul), lay = pl.lay;
+  // landing spots carry the flower's resting position (no sway), so the butterfly's choice can't flicker
+  const spot = (x, y, R, pts, i, dx=0, dy=0) => spots.push({ x, y, R, rx: it.O[0] + (pts[i][0] + dx)*fs, ry: it.O[1] + (pts[i][1] + dy)*fs });
   ctx.strokeStyle = P.vine; ctx.lineCap='round'; ctx.lineJoin='round';
   if (it.visMain <= 0) return;
   // stem, tapered toward the tip
@@ -777,20 +779,20 @@ function drawPlant(ctx, it, M, P, pass, spots){
     if (tw.lay[last]!==pass) return; const q = t.E[last];
     let bloom = t.bloom; if (scatter) bloom = Math.min(bloom, scatterBloom(tw.sph, M.u));
     drawFlower(ctx, tw.end, q[0],q[1], tw.fl.R*fs, tangentAt(t.E,last), flowerRot(M,pl.ph+2,q[0]), tw.fl, bloom, P);
-    if (isBloom(tw.end) && t.bloom > 0.5) spots.push({ x:q[0], y:q[1], R:tw.fl.R*fs }); });
+    if (isBloom(tw.end) && t.bloom > 0.5) spot(q[0], q[1], tw.fl.R*fs, tw.pts, last); });
   // clustered blooms along branches
   for (const b of pl.blooms){ const path = b.on < 0 ? D : it.T[b.on].E, vis = b.on < 0 ? it.visMain : it.T[b.on].vis, L = b.on < 0 ? lay : pl.twigs[b.on].lay;
     const i = Math.min(b.i, path.length-1); if (L[i]!==pass) continue;
     let bloom = easeBack(clamp((vis - i)/5)); if (scatter) bloom = Math.min(bloom, scatterBloom(b.sph, M.u)); if (bloom<=0.01) continue;
     const x = path[i][0] + b.dx*fs, y = path[i][1] + b.dy*fs;
     drawFlower(ctx, b.kind, x, y, b.fl.R*fs, tangentAt(path,i), flowerRot(M, pl.ph+b.sph*5, x), b.fl, bloom, P);
-    if (b.kind==='sakura' && bloom > 0.5) spots.push({ x, y, R:b.fl.R*fs }); }
+    if (b.kind==='sakura' && bloom > 0.5) spot(x, y, b.fl.R*fs, b.on < 0 ? pl.main.pts : pl.twigs[b.on].pts, i, b.dx, b.dy); }
   // main end
   if (pl.end!=='curl' && pl.end!=='none'){ const last = pl.main.stem-1; if (lay[last]!==pass) return; const q = D[last];
     let bloom = it.endBloom; if (scatter) bloom = Math.min(bloom, scatterBloom(pl.sph, M.u));
     const breathe = 1 + 0.045*Math.sin(TAU*M.u*M.cycles + pl.ph + 0.7);
     drawFlower(ctx, pl.end, q[0],q[1], pl.fl.R*fs*breathe, tangentAt(D,last), flowerRot(M,pl.ph,q[0]), pl.fl, bloom, P);
-    if (isBloom(pl.end) && it.endBloom > 0.5) spots.push({ x:q[0], y:q[1], R:pl.fl.R*fs }); }
+    if (isBloom(pl.end) && it.endBloom > 0.5) spot(q[0], q[1], pl.fl.R*fs, pl.main.pts, last); }
 }
 
 function drawLight(ctx, M, P){
@@ -826,18 +828,19 @@ function drawFalling(ctx, M, P){
 function bez(a,b,c,d,t){ const m=1-t; return [m*m*m*a[0]+3*m*m*t*b[0]+3*m*t*t*c[0]+t*t*t*d[0], m*m*m*a[1]+3*m*m*t*b[1]+3*m*t*t*c[1]+t*t*t*d[1]]; }
 function drawButterfly(ctx, M, P, spots){
   const W=M.W, H=M.H, u=M.u, L=layout(W,H);
-  const near = spots.filter(s => Math.abs(s.x - W/2) < L.tw*0.45);
+  // choose by resting position (stable), then follow that flower's live sway
+  const near = spots.filter(s => Math.abs(s.rx - W/2) < L.tw*0.45);
   const pool = near.length ? near : spots;
-  const T = pool.length ? (p => [p.x, p.y - p.R*0.35])(pool.slice().sort((a,b)=>a.y-b.y)[0]) : [W*0.5, L.base - M.fs*0.78];
-  const P0=[-0.12*W, H*0.2], P3=[1.12*W, H*0.1];
-  let pos, tilt=0;
-  const flight = (a,b,c,d,t)=>{ const p=bez(a,b,c,d,t), q=bez(a,b,c,d,Math.min(1,t+0.01)); tilt = clamp((q[0]-p[0])/(M.fs*0.05),-1,1)*0.35; return p; };
-  if (u < 0.38){ const t=easeInOut(u/0.38); pos = flight(P0,[W*0.2,H*0.04],[T[0]-W*0.18,T[1]-H*0.22],T,t); pos[1] += Math.sin(TAU*u*9)*M.fs*0.05*(1-t); }
-  else if (u < 0.66){ pos = T; }
-  else { const t=easeIn((u-0.66)/0.34); pos = flight(T,[T[0]+W*0.1,T[1]-H*0.3],[W*0.86,0],P3,t); pos[1] += Math.sin(TAU*u*9)*M.fs*0.05*t; }
+  const T = pool.length ? (p => [p.x, p.y - p.R*0.35])(pool.slice().sort((a,b) => (a.ry - b.ry) || (a.rx - b.rx))[0]) : [W*0.5, L.base - M.fs*0.78];
+  const s = Math.max(40, M.fs*0.44);
+  const P0=[-0.12*W - s, H*0.2], P3=[1.12*W + s, H*0.1];      // fully off screen at the loop seam, whatever the width
+  const at = v => { if (v < 0.38){ const t=easeInOut(v/0.38), q = bez(P0,[W*0.2,H*0.04],[T[0]-W*0.18,T[1]-H*0.22],T,t); q[1] += Math.sin(TAU*v*9)*M.fs*0.05*(1-t); return q; }
+    if (v < 0.66) return T.slice();
+    const t=easeIn((v-0.66)/0.34), q = bez(T,[T[0]+W*0.1,T[1]-H*0.3],[W*0.86,0],P3,t); q[1] += Math.sin(TAU*v*9)*M.fs*0.05*t; return q; };
+  // bank from the real horizontal speed: it eases to zero on landing and take-off, so the tilt never snaps
+  const pos = at(u), ahead = at(Math.min(u + 0.004, 0.9999)), tilt = clamp((ahead[0]-pos[0])/(M.fs*0.06), -1, 1)*0.35;
   const fast = 0.18 + 0.82*Math.abs(Math.sin(TAU*u*14)), slow = 0.62 + 0.38*Math.sin(TAU*u*3);
   const open = lerp(fast, slow, clamp(Math.min((u-0.34)/0.06, (0.7-u)/0.06)));
-  const s = Math.max(40, M.fs*0.44);
   ctx.save(); ctx.translate(pos[0], pos[1]); ctx.rotate(tilt);
   for (const side of [-1,1]){
     ctx.save(); ctx.scale(side*open, 1);
