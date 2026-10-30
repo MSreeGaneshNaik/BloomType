@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icon.png" width="128" height="128" alt="BloomType app icon: six rose-red petals on a dark glass tile">
+  <img src="assets/icon.svg" width="128" height="128" alt="The Jericho petal mark: six white petals on a tomato-red glass tile">
 </p>
 
 <h1 align="center">BloomType <sub>by Jericho</sub></h1>
@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/demo.gif" width="100%" alt="The word Growth on a cream poster. Blue vines climb around its letters, weaving over and under the strokes, and red swirl roses sway in a seamless loop.">
+  <img src="assets/demo.webp" width="100%" alt="The word Growth on a cream poster. Blue vines climb around its letters, weaving over and under the strokes, and red swirl roses sway in a seamless loop.">
 </p>
 
 ## Try it
@@ -25,7 +25,7 @@ Open **[msreeganeshnaik.github.io/BloomType](https://msreeganeshnaik.github.io/B
 
 | You | BloomType |
 |---|---|
-| Type a word | Vines sprout from each letter's own outline, climb it like ivy and weave over and under its strokes |
+| Type a word, and press <kbd>Enter</kbd> for a new line | Vines sprout from each letter's own outline, climb it like ivy and weave over and under its strokes |
 | Pick a garden | Roses, tulips, daisies, wisteria, blossom, or a mix of all of them |
 | Drag **Intensity** | The garden fills in from a few sprigs to overgrown, live, as you drag |
 | Press **Regrow garden** | A new random garden at the same intensity, every time |
@@ -45,7 +45,7 @@ Open **[msreeganeshnaik.github.io/BloomType](https://msreeganeshnaik.github.io/B
 | Garden | What grows |
 |---|---|
 | **Roses** | Climbing vines with swirl roses, buds and corkscrew tendrils |
-| **Tulips** | The same climbing vines, crowned with cupped tulips that face along the stem |
+| **Tulips** | Tall stems rising out of the letters, broad folded leaves, and cupped tulips, some flame-tipped, some still in bud |
 | **Daisies** | Climbing vines with open daisies |
 | **Wisteria** | Climbing vines with flower clusters that hang and swing |
 | **Blossom** | Angular branches with clusters of five-petal blossom, and petals that fall in every motion |
@@ -97,7 +97,7 @@ export default function Hero() {
 }
 ```
 
-The snippet is self-contained (about 40 KB) and only fetches its typeface from Google Fonts.
+The snippet is self-contained (about 42 KB) and only fetches its typeface from Google Fonts.
 
 ## Private by design
 
@@ -119,17 +119,20 @@ cd BloomType
 npx serve .            # or just open index.html in a browser
 ```
 
+Then open `/test.html` to run the checks: every garden and motion loops without a seam, embed code survives any word, and two embeds on one page stay in their own boxes.
+
 There is no build step and no framework — one HTML file, about 1,300 lines.
 
 | File | What it does |
 |---|---|
 | [`index.html`](index.html) | The whole app. `<script id="bloom-engine">` is the engine: letter outlines as distance fields, climbing growth, the flowers, the motions and the renderer. The script after it is the editor: the panel, the live preview and every export. The engine is also what the HTML file and embed code ship. |
-| [`assets/`](assets) | The icon and the images in this README |
+| [`test.html`](test.html) | The checks, in one page with no dependencies |
+| [`assets/`](assets) | The Jericho petal mark as a vector (`icon.svg`, also the favicon) and a 1024 px PNG, plus the README media: a retina screenshot, a supersampled garden grid and the demo as a full-colour animated WebP |
 | [`.nojekyll`](.nojekyll) | Tells GitHub Pages to serve the files as they are |
 
 ## Good to know
 
-- Words can be up to 16 characters. Emoji are not allowed.
+- Up to three lines of 16 characters; press <kbd>Enter</kbd> for a new line. Emoji are not allowed.
 - Your last word, garden and settings are remembered in your browser.
 - MP4 export needs WebCodecs (current Chrome, Edge, Safari and Firefox). Browsers without it record a WebM instead.
 - Lighthouse, measured locally: Performance 95+ on mobile and 100 on desktop; Accessibility, Best Practices and SEO 100.
