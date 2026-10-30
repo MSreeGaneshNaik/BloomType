@@ -1,0 +1,1255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Type a word and grow a living garden around it. Roses, blossom or meadow; export MP4, PNG frames, HTML or embed code.">
+<meta property="og:title" content="BloomType">
+<meta property="og:description" content="Type a word and grow a living garden around it.">
+<meta property="og:image" content="https://msreeganeshnaik.github.io/BloomType/docs/preview.png">
+<meta name="theme-color" content="#0A0A0A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 28c6-2 7-9 12-11' stroke='%2322339E' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='19' cy='13' r='9' fill='%23F0461F'/%3E%3Cpath d='M17 13a2.5 2.5 0 1 1 3.4 2.3c-2.4.8-4.8-.9-4.6-3.3' stroke='%23FFD0BD' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>BloomType</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500&family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,400&family=Instrument+Serif&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Pinyon+Script&family=Playfair+Display:wght@400&display=swap">
+<style>
+/* Layout: fixed tool panel on the left, full-bleed living poster on the right; panel becomes a bottom sheet on phones. */
+:root{
+  --chrome:#0A0A0A;
+  --card:#141414;
+  --card-hover:#1B1B1B;
+  --edge:rgba(237,234,228,.11);
+  --edge-strong:#EDEAE4;
+  --text:#EDEAE4;
+  --muted:#8F8B84;
+  --stage:#EEEAE3;
+  --serif:"Newsreader","Iowan Old Style",Georgia,serif;
+  --mono:"DM Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{margin:0;background:var(--chrome);color:var(--text);font:13px/1.45 var(--mono);overflow:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:#EDEAE4;color:#0A0A0A}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--edge-strong);outline-offset:2px}
+
+.app{position:relative;display:grid;grid-template-columns:var(--panel-w,316px) 1fr;height:100%;transition:grid-template-columns .5s var(--ease-out)}
+.app.collapsed{--panel-w:0px}
+
+/* ---------- panel ---------- */
+.panel{position:relative;z-index:2;background:var(--chrome);overflow:hidden;min-width:0}
+.panel-inner{width:316px;height:100%;box-sizing:border-box;overflow-y:auto;padding:22px 20px 28px;display:flex;flex-direction:column;gap:26px;scrollbar-width:thin;scrollbar-color:#2A2A2A transparent;transition:opacity .3s var(--ease-out),transform .5s var(--ease-out)}
+.app.collapsed .panel-inner{opacity:0;transform:translateX(-24px);pointer-events:none}
+.panel-inner::-webkit-scrollbar{width:8px}
+.panel-inner::-webkit-scrollbar-thumb{background:#2A2A2A;border-radius:8px}
+
+.head h1{font:600 30px/1 var(--serif);letter-spacing:-.02em;margin:0 0 6px}
+.head p{margin:0;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+
+.group{display:flex;flex-direction:column;gap:10px}
+.label{margin:0;font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+.word{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:10px 14px;font:600 24px/1.2 var(--serif);letter-spacing:-.01em;caret-color:var(--text);transition:border-color .2s}
+.word:focus{outline:none;border-color:var(--edge-strong)}
+.word::placeholder{color:#55524D}
+
+.btn{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;background:var(--card);border:1px solid var(--edge);border-radius:999px;padding:8px 14px;font:500 12.5px/1 var(--mono);transition:background .15s,border-color .15s,transform .1s}
+.btn:hover{background:var(--card-hover);border-color:rgba(237,234,228,.28)}
+.btn:active{transform:scale(.97)}
+.btn svg{width:14px;height:14px;flex:none}
+.btn.spin svg{animation:spin .6s var(--ease-out)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.meter{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.meter-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.meter-row label{font:500 12.5px/1 var(--mono)}
+.meter-row output{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+.meter input{-webkit-appearance:none;appearance:none;width:100%;height:22px;margin:0;background:transparent;cursor:pointer;--p:45%}
+.meter input::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:linear-gradient(to right,var(--text) var(--p),#2A2A2A var(--p))}
+.meter input::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;background:var(--text);border:3px solid var(--chrome);box-sizing:content-box;transition:transform .15s var(--ease-out)}
+.meter input:active::-webkit-slider-thumb{transform:scale(1.15)}
+.meter input::-moz-range-track{height:4px;border-radius:4px;background:#2A2A2A}
+.meter input::-moz-range-progress{height:4px;border-radius:4px;background:var(--text)}
+.meter input::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--text);border:3px solid var(--chrome)}
+.meter input:focus-visible{outline:none}
+.meter input:focus-visible::-webkit-slider-thumb{outline:2px solid var(--edge-strong);outline-offset:2px}
+.meter-ends{display:flex;justify-content:space-between;color:#5F5B55;font-size:10.5px}
+.stats{display:flex;flex-wrap:wrap;gap:4px 12px;margin:0;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+.stats b{color:var(--text);font-weight:500}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid.three{grid-template-columns:repeat(3,1fr)}
+.card{position:relative;text-align:left;background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:10px 11px 11px;transition:background .15s,border-color .15s,transform .1s}
+.card:hover{background:var(--card-hover)}
+.card:active{transform:scale(.98)}
+.card[aria-checked="true"]{border-color:var(--edge-strong);box-shadow:inset 0 0 0 .5px var(--edge-strong)}
+.card .t{display:block;font:500 13px/1.2 var(--mono);margin-bottom:4px}
+.card .d{display:block;color:var(--muted);font-size:11.5px;line-height:1.35}
+.card .face{display:block;font-size:21px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .face + .d{margin-top:2px}
+
+.glyph{display:block;height:34px;margin:-2px 0 6px}
+.glyph svg{height:100%;width:auto;display:block}
+
+.swatch{display:flex;align-items:center;justify-content:center;gap:10px;height:42px;border-radius:8px;margin-bottom:8px}
+.dots{position:relative;width:24px;height:14px}
+.dots i{position:absolute;top:0;width:14px;height:14px;border-radius:50%}
+.dots i:first-child{left:0}
+.dots i:last-child{left:9px;width:12px;height:12px;top:1px}
+.swatch span{font:400 19px/1 var(--serif)}
+.card .n{font:500 12px/1 var(--mono)}
+
+.seg{display:grid;grid-template-columns:repeat(5,1fr);background:var(--card);border:1px solid var(--edge);border-radius:10px;padding:3px;gap:3px}
+.seg button{background:none;border:0;border-radius:7px;padding:8px 0;font:500 12px/1 var(--mono);color:var(--muted);transition:background .15s,color .15s;font-variant-numeric:tabular-nums}
+.seg button:hover{color:var(--text)}
+.seg button[aria-checked="true"]{background:#262626;color:var(--text)}
+
+.export{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.xbtn{border-radius:12px;padding:12px 10px;text-align:left;background:var(--card);border:1px solid var(--edge);transition:background .15s,transform .1s}
+.xbtn:hover{background:var(--card-hover)}
+.xbtn:active{transform:scale(.98)}
+.xbtn.primary{background:var(--text);color:#0A0A0A;border-color:var(--text)}
+.xbtn.primary:hover{background:#FFFFFF}
+.xbtn .t{display:block;font:500 13px/1.2 var(--mono)}
+.xbtn .d{display:block;font-size:11px;opacity:.62;margin-top:3px;font-variant-numeric:tabular-nums}
+.xbtn:disabled{opacity:.45;cursor:default;transform:none}
+.progress{display:none;flex-direction:column;gap:7px}
+.progress.on{display:flex}
+.bar{height:4px;background:#222;border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--text);border-radius:4px}
+.ptext,.note{margin:0;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+.xbtn.wide{grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.xbtn.wide svg{width:16px;height:16px;flex:none;opacity:.8}
+.switch{position:relative;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.switch input{position:absolute;left:0;top:50%;opacity:0;width:30px;height:18px;margin:-9px 0 0;cursor:pointer}
+.switch .track{position:relative;width:30px;height:18px;border-radius:999px;background:#2A2A2A;transition:background .2s;flex:none}
+.switch .track::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#8F8B84;transition:transform .25s var(--ease-out),background .2s}
+.switch input:checked + .track{background:var(--text)}
+.switch input:checked + .track::after{transform:translateX(12px);background:#0A0A0A}
+.switch input:focus-visible + .track{outline:2px solid var(--edge-strong);outline-offset:2px}
+.switch .sl{font-size:12px}
+.switch .sl small{display:block;color:var(--muted);font-size:11px}
+.code{display:flex;flex-direction:column;gap:8px}
+.tabs{display:flex;gap:4px}
+.tabs button{background:none;border:0;border-radius:7px;padding:6px 10px;font:500 12px/1 var(--mono);color:var(--muted)}
+.tabs button[aria-selected="true"]{background:#262626;color:var(--text)}
+.code textarea{width:100%;box-sizing:border-box;height:150px;resize:vertical;background:#0F0F0F;border:1px solid var(--edge);border-radius:10px;padding:10px;font:11px/1.5 var(--mono);color:#CFCBC4;white-space:pre;overflow:auto}
+.code textarea:focus{outline:none;border-color:var(--edge-strong)}
+.code-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.code-row span{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+[hidden]{display:none!important}
+
+/* ---------- stage ---------- */
+.stage{position:relative;background:var(--stage);transition:background .45s ease;overflow:hidden;min-width:0;cursor:text}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.float{position:absolute;display:flex;align-items:center;gap:6px;background:rgba(10,10,10,.82);color:var(--text);border-radius:999px;padding:5px;z-index:3;cursor:default}
+.float button{display:grid;place-items:center;width:32px;height:32px;border:0;border-radius:50%;background:none;transition:background .15s}
+.float button:hover{background:rgba(255,255,255,.1)}
+.float svg{width:16px;height:16px}
+.tl{left:14px;top:14px}
+.transport{left:50%;bottom:16px;transform:translateX(-50%);padding:5px 14px 5px 5px;gap:10px}
+.transport input{width:min(240px,38vw);accent-color:#EDEAE4}
+.transport output{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:74px}
+
+@media (max-width:760px){
+  body{overflow:auto}
+  .app,.app.collapsed{display:flex;flex-direction:column-reverse;height:auto;min-height:100%}
+  .stage{height:62vh;min-height:340px;flex:none}
+  .panel-inner{width:auto;height:auto;overflow:visible;padding:20px max(16px,env(safe-area-inset-right,0px)) 32px max(16px,env(safe-area-inset-left,0px))}
+  .app.collapsed .panel-inner{opacity:1;transform:none;pointer-events:auto}
+  .tl{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .app,.panel-inner,.stage{transition:none}
+  .btn.spin svg{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <aside class="panel" id="panel" aria-label="Poster controls">
+    <div class="panel-inner">
+      <header class="head">
+        <h1>Poster</h1>
+        <p id="meta">3s loop · 30 fps</p>
+      </header>
+
+      <section class="group" aria-labelledby="l-words">
+        <h2 class="label" id="l-words">Words</h2>
+        <input class="word" id="word" type="text" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type a word" aria-label="Word on the poster">
+        <button class="btn" id="regrow" type="button" title="Regrow with a new random garden (R)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.7-4"/><path d="M13.6 2.2v3.2h-3.2"/></svg>
+          Regrow garden
+        </button>
+        <div class="meter">
+          <div class="meter-row"><label for="intensity">Intensity</label><output id="intensityOut" for="intensity"></output></div>
+          <input type="range" id="intensity" min="0" max="100" step="1" value="45">
+          <div class="meter-ends" aria-hidden="true"><span>A few sprigs</span><span>Overgrown</span></div>
+        </div>
+        <p class="stats" id="stats" aria-live="polite"></p>
+      </section>
+
+      <section class="group" aria-labelledby="l-style">
+        <h2 class="label" id="l-style">Garden</h2>
+        <div class="grid three" id="styles" role="radiogroup" aria-labelledby="l-style"></div>
+      </section>
+
+      <section class="group" aria-labelledby="l-font">
+        <h2 class="label" id="l-font">Typeface</h2>
+        <div class="grid" id="fonts" role="radiogroup" aria-labelledby="l-font"></div>
+      </section>
+
+      <section class="group" aria-labelledby="l-motion">
+        <h2 class="label" id="l-motion">Motion</h2>
+        <div class="grid" id="motions" role="radiogroup" aria-labelledby="l-motion"></div>
+      </section>
+
+      <section class="group" aria-labelledby="l-palette">
+        <h2 class="label" id="l-palette">Palette</h2>
+        <div class="grid" id="palettes" role="radiogroup" aria-labelledby="l-palette"></div>
+      </section>
+
+      <section class="group" aria-labelledby="l-export">
+        <h2 class="label" id="l-export">Export</h2>
+        <div class="seg" id="ratios" role="radiogroup" aria-label="Export ratio"></div>
+        <label class="switch"><input type="checkbox" id="transparent"><span class="track" aria-hidden="true"></span><span class="sl">Transparent background<small>PNG, HTML and embed code</small></span></label>
+        <div class="export">
+          <button class="xbtn primary" id="xmp4" type="button"><span class="t">MP4</span><span class="d" id="xmp4d">One loop</span></button>
+          <button class="xbtn" id="xpng" type="button"><span class="t">PNG frames</span><span class="d" id="xpngd">Zipped</span></button>
+          <button class="xbtn" id="xstill" type="button"><span class="t">Still PNG</span><span class="d">This frame</span></button>
+          <button class="xbtn" id="xhtml" type="button"><span class="t">HTML file</span><span class="d">Live, any size</span></button>
+          <button class="xbtn wide" id="xcode" type="button" aria-expanded="false" aria-controls="codePanel"><span><span class="t">Embed code</span><span class="d">For websites: HTML or React</span></span>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 4.5 2 8l3.5 3.5M10.5 4.5 14 8l-3.5 3.5"/></svg></button>
+        </div>
+        <div class="code" id="codePanel" hidden>
+          <div class="tabs" role="tablist" aria-label="Code format">
+            <button type="button" role="tab" aria-selected="true" data-k="html">HTML</button>
+            <button type="button" role="tab" aria-selected="false" data-k="react">React</button>
+          </div>
+          <textarea id="codeOut" readonly spellcheck="false" aria-label="Embed code"></textarea>
+          <div class="code-row"><button class="btn" id="copyCode" type="button">Copy code</button><span id="codeSize"></span></div>
+          <p class="note" id="codeNote">Paste into Webflow, Framer, WordPress or any HTML page. It draws live, scales to its box and pauses when off screen.</p>
+        </div>
+        <div class="progress" id="progress"><div class="bar"><i id="pbar"></i></div><p class="ptext" id="ptext"></p></div>
+        <p class="note" id="xnote" hidden></p>
+      </section>
+    </div>
+  </aside>
+
+  <main class="stage" id="stage">
+    <canvas id="cv" aria-label="Animated poster"></canvas>
+    <div class="float tl">
+      <button id="togglePanel" type="button" aria-label="Hide controls" title="Hide controls (\)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="1.75" y="2.75" width="12.5" height="10.5" rx="2.5"/><path d="M6 2.75v10.5"/></svg>
+      </button>
+    </div>
+    <div class="float transport">
+      <button id="play" type="button" aria-label="Pause" title="Play / pause (Space)">
+        <svg id="playIcon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="4" y="3" width="2.6" height="10" rx="1"/><rect x="9.4" y="3" width="2.6" height="10" rx="1"/></svg>
+      </button>
+      <input id="scrub" type="range" min="0" max="89" value="0" step="1" aria-label="Frame">
+      <output id="frameOut">1 / 90</output>
+    </div>
+  </main>
+</div>
+
+<script id="bloom-engine">
+/* =========================================================
+   BloomType engine: a clean-room rebuild of the "type garden" reel.
+   This script is also what the HTML file and embed code ship.
+   Poster = f(word, seed, style, font, palette, motion, frame size, time).
+   Everything that moves is periodic in the loop, so exports loop seamlessly.
+   ========================================================= */
+const TAU = Math.PI * 2;
+const FPS = 30;
+
+const PALETTES = [
+  { id:'rose-noir', name:'Rose noir', bg:'#070707', ink:'#F3EFE7', flower:'#E3261B', detail:'#FF9E92', vine:'#2B4BE3' },
+  { id:'paper',     name:'Paper',     bg:'#EEEAE3', ink:'#131313', flower:'#F0461F', detail:'#FFD0BD', vine:'#22339E' },
+  { id:'midnight',  name:'Midnight',  bg:'#0C1A4C', ink:'#F4F1EA', flower:'#F3675B', detail:'#FFD6CB', vine:'#97A6F4' },
+  { id:'citrus',    name:'Citrus',    bg:'#0B1410', ink:'#F3ECDC', flower:'#F7931E', detail:'#FFE3AA', vine:'#2EA36A' },
+  { id:'orchid',    name:'Orchid',    bg:'#1B0A24', ink:'#F6EEF6', flower:'#E244EC', detail:'#FFC9F6', vine:'#3CB3A2' },
+  { id:'moss',      name:'Moss',      bg:'#173A29', ink:'#F1EDE0', flower:'#F3B4BC', detail:'#C8505F', vine:'#8FCF94' },
+  { id:'tomato',    name:'Tomato',    bg:'#F2200F', ink:'#121212', flower:'#F6EDE0', detail:'#F08A7C', vine:'#121212' },
+  { id:'butter',    name:'Butter',    bg:'#FBE5A6', ink:'#141414', flower:'#D81F2B', detail:'#FFA3A5', vine:'#1E5B3B' },
+];
+const MOTIONS = [
+  { id:'static',  name:'Static',        desc:'Still poster',        dur:3, still:true },
+  { id:'breathe', name:'Breathe',       desc:'Slow sway',           dur:3 },
+  { id:'grow',    name:'Grow & wither', desc:'Bloom, then back',    dur:6 },
+  { id:'typed',   name:'Typed',         desc:'Type, cut, repeat',   dur:5 },
+  { id:'gust',    name:'Gust',          desc:'Wind sweeps through', dur:4 },
+  { id:'reach',   name:'Reach',         desc:'Stems follow a light',dur:6 },
+  { id:'scatter', name:'Scatter',       desc:'Random bloom, fade',  dur:6 },
+  { id:'visitor', name:'Visitor',       desc:'Butterfly drops by',  dur:7 },
+];
+const STYLES = [
+  { id:'rose',    name:'Roses',   desc:'Climbing vines', noun:'roses',
+    icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M4 30c6-2 7-10 13-12s9 4 14-1" stroke="#97A6F4" stroke-width="1.6" stroke-linecap="round"/><path d="M17 18c-1-3 1-5 3-4" stroke="#97A6F4" stroke-width="1.4" stroke-linecap="round"/><circle cx="32" cy="14" r="6" fill="#F3675B"/><path d="M31 14a1.6 1.6 0 1 1 2 1.5c-1.6.5-3-.6-3-2.2" stroke="#FFD6CB" stroke-width="1.1" stroke-linecap="round"/></svg>' },
+  { id:'blossom', name:'Blossom', desc:'Petals fall', noun:'blossoms',
+    icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M3 29l9-5 6 1 7-8 5-1 6-6M18 25l3-7" stroke="#97A6F4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><g fill="#F3675B"><circle cx="30" cy="11" r="3"/><circle cx="35" cy="9" r="2.4"/><circle cx="21" cy="16" r="2.6"/></g><circle cx="12" cy="9" r="1.6" fill="#F3675B" opacity=".8"/></svg>' },
+  { id:'meadow',  name:'Meadow',  desc:'Wildflowers', noun:'flowers',
+    icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M6 32c1-6 0-9-2-12M10 32c0-5 2-8 4-10M20 32c0-8-1-14-2-20M30 32c0-6 2-12 3-16" stroke="#97A6F4" stroke-width="1.5" stroke-linecap="round"/><g fill="#F3675B"><circle cx="18" cy="9" r="4.4"/><circle cx="33" cy="13" r="3.4"/></g><circle cx="18" cy="9" r="1.6" fill="#FFD6CB"/><circle cx="33" cy="13" r="1.2" fill="#0C1A4C"/></svg>' },
+];
+const FONTS = [
+  { id:'newsreader', name:'Newsreader',   family:'Newsreader',          weight:400, fb:'Georgia, serif' },
+  { id:'playfair',   name:'Playfair',     family:'Playfair Display',    weight:400, fb:'Georgia, serif' },
+  { id:'instrument', name:'Instrument',   family:'Instrument Serif',    weight:400, fb:'Georgia, serif' },
+  { id:'fraunces',   name:'Fraunces',     family:'Fraunces',            weight:400, fb:'Georgia, serif' },
+  { id:'bricolage',  name:'Bricolage',    family:'Bricolage Grotesque', weight:500, fb:'system-ui, sans-serif' },
+  { id:'pinyon',     name:'Pinyon Script',family:'Pinyon Script',       weight:400, fb:'cursive' },
+];
+const RATIOS = [
+  { id:'full', label:'Full' },
+  { id:'1:1',  label:'1:1',  wh:[1080,1080] },
+  { id:'4:5',  label:'4:5',  wh:[1080,1350] },
+  { id:'9:16', label:'9:16', wh:[1080,1920] },
+  { id:'16:9', label:'16:9', wh:[1920,1080] },
+];
+
+/* ---------- small math ---------- */
+const clamp = (x,a=0,b=1) => x<a?a:x>b?b:x;
+const lerp = (a,b,t) => a+(b-a)*t;
+const easeOut = x => 1-Math.pow(1-x,3);
+const easeIn = x => x*x*x;
+const easeInOut = x => x<.5 ? 4*x*x*x : 1-Math.pow(-2*x+2,3)/2;
+const easeBack = x => { const c1=1.5, c3=c1+1; return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2); };
+const fract = x => x - Math.floor(x);
+const angDiff = (a,b) => Math.atan2(Math.sin(a-b), Math.cos(a-b));
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function hash(...xs){ let h=2166136261>>>0; for(const x of xs){ const s=String(x); for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } h^=124; h=Math.imul(h,16777619); } return h>>>0; }
+function hexRgb(h){ const n=parseInt(h.slice(1),16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+function mix(a,b,t){ const A=hexRgb(a),B=hexRgb(b); return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join(''); }
+function rgba(h,a){ const [r,g,b]=hexRgb(h); return `rgba(${r},${g},${b},${a})`; }
+
+/* ---------- state ---------- */
+const S = { word:'Growth', palette:'paper', motion:'breathe', style:'rose', font:'newsreader', ratio:'full', seed:20241031, density:1 };
+let fontsReady = false, editing = false;
+const pointer = { x:0, y:0, t:0, active:false };
+const PAL = () => PALETTES.find(p=>p.id===S.palette) || PALETTES[0];
+const MOT = () => MOTIONS.find(m=>m.id===S.motion) || MOTIONS[0];
+const FNT = () => FONTS.find(f=>f.id===S.font) || FONTS[0];
+const STY = () => STYLES.find(s=>s.id===S.style) || STYLES[0];
+const fontCss = (size, f=FNT()) => `${f.weight} ${size}px "${f.family}", ${f.fb}`;
+
+/* =========================================================
+   Glyph fields: each letter becomes a signed distance field (em units),
+   so vines can climb along its outline and weave over and under its strokes.
+   ========================================================= */
+const fieldCache = new Map();
+function chamfer(seed, cols, rows){
+  const INF = 1e9, d = new Float32Array(cols*rows), D2 = 1.4142;
+  for (let i=0;i<d.length;i++) d[i] = seed[i] ? 0 : INF;
+  for (let y=0;y<rows;y++) for (let x=0;x<cols;x++){ const i=y*cols+x; let v=d[i]; if (!v) continue;
+    if (x>0) v=Math.min(v,d[i-1]+1); if (y>0){ v=Math.min(v,d[i-cols]+1); if (x>0) v=Math.min(v,d[i-cols-1]+D2); if (x<cols-1) v=Math.min(v,d[i-cols+1]+D2); } d[i]=v; }
+  for (let y=rows-1;y>=0;y--) for (let x=cols-1;x>=0;x--){ const i=y*cols+x; let v=d[i]; if (!v) continue;
+    if (x<cols-1) v=Math.min(v,d[i+1]+1); if (y<rows-1){ v=Math.min(v,d[i+cols]+1); if (x<cols-1) v=Math.min(v,d[i+cols+1]+D2); if (x>0) v=Math.min(v,d[i+cols-1]+D2); } d[i]=v; }
+  return d;
+}
+function glyphField(ch){
+  const f = FNT(), key = f.id+'|'+ch;
+  if (fieldCache.has(key)) return fieldCache.get(key);
+  const SZ = 140, G = 2, cw = SZ*2.8, chh = SZ*2.6, ox = SZ*0.7, oy = SZ*1.6;
+  const c = document.createElement('canvas'); c.width = cw; c.height = chh;
+  const g = c.getContext('2d', { willReadFrequently:true });
+  g.font = fontCss(SZ, f); g.textBaseline = 'alphabetic'; g.fillStyle = '#000'; g.fillText(ch, ox, oy);
+  const data = g.getImageData(0,0,cw,chh).data, cols = cw/G|0, rows = chh/G|0;
+  const inside = new Uint8Array(cols*rows), outside = new Uint8Array(cols*rows);
+  let ink = 0, cx = 0, cy = 0;
+  for (let y=0;y<rows;y++) for (let x=0;x<cols;x++){ const a = data[((y*G+1)*cw + x*G+1)*4+3]; const i=y*cols+x;
+    if (a > 128){ inside[i]=1; ink++; cx+=x; cy+=y; } else outside[i]=1; }
+  const F = { ox, oy, SZ, G, cols, rows, d:null, ink:[], edge:[], empty: ink < 6 };
+  if (!F.empty){
+    const dOut = chamfer(inside, cols, rows), dIn = chamfer(outside, cols, rows), d = new Float32Array(cols*rows), k = G/SZ;
+    for (let i=0;i<d.length;i++) d[i] = inside[i] ? -dIn[i]*k : dOut[i]*k;
+    F.d = d; cx/=ink; cy/=ink;
+    for (let y=1;y<rows-1;y+=1) for (let x=1;x<cols-1;x+=1){ const i=y*cols+x; if (!inside[i]) continue;
+      const ex = (x*G - ox)/SZ, ey = (y*G - oy)/SZ;
+      if ((x+y)%2===0) F.ink.push([ex,ey]);
+      if (outside[i-1]||outside[i+1]||outside[i-cols]||outside[i+cols]) F.edge.push([ex,ey, Math.hypot(x-cx,y-cy)]); }
+  }
+  fieldCache.set(key, F); return F;
+}
+/* signed distance (em) + unit gradient pointing away from ink */
+function sampleField(F, ex, ey){
+  if (!F || !F.d) return null;
+  const fx = (ex*F.SZ + F.ox)/F.G, fy = (ey*F.SZ + F.oy)/F.G;
+  if (fx < 1 || fy < 1 || fx > F.cols-2 || fy > F.rows-2) return null;
+  const at = (x,y) => { const x0=Math.floor(x), y0=Math.floor(y), tx=x-x0, ty=y-y0, i=y0*F.cols+x0;
+    return lerp(lerp(F.d[i],F.d[i+1],tx), lerp(F.d[i+F.cols],F.d[i+F.cols+1],tx), ty); };
+  const d = at(fx,fy), gx = at(fx+0.7,fy)-at(fx-0.7,fy), gy = at(fx,fy+0.7)-at(fx,fy-0.7), l = Math.hypot(gx,gy) || 1;
+  return [d, gx/l, gy/l];
+}
+
+/* =========================================================
+   Growth walker. One function grows every stem in every style:
+   - hug: follow the letter's outline at a small offset (ivy climbing a wall)
+   - angular: twiggy zig-zag (blossom branches)
+   - otherwise: smooth meander
+   ========================================================= */
+function growPath(F, root, h0, N, step, wav, opt, r){
+  const pts=[[root[0],root[1]]]; let x=root[0], y=root[1], h=h0, seg=2+(r()*3|0);
+  for (let i=1;i<=N;i++){
+    const s = sampleField(F, x, y);
+    if (opt.hug && i <= opt.hug && s){
+      const [d,gx,gy] = s, tx=-gy*opt.dir, ty=gx*opt.dir, corr=clamp((d-opt.d0)*16,-1,1);
+      h += angDiff(Math.atan2(ty-gy*corr, tx-gx*corr), h)*0.42;
+    } else if (opt.angular){
+      if (--seg <= 0){ h = clamp(h + (r()<.5?-1:1)*(0.22+r()*0.45), h0-0.8, h0+0.8); seg = 3+(r()*5|0); }
+    } else {
+      h += wav.a1*wav.f1*Math.cos(i*wav.f1+wav.p1) + wav.a2*wav.f2*Math.cos(i*wav.f2+wav.p2) + wav.bend;
+      if (opt.hug && s && i < opt.hug+10) h += angDiff(Math.atan2(s[2],s[1]), h)*0.14;   // peel away from the letter
+    }
+    x += Math.cos(h)*step; y += Math.sin(h)*step; pts.push([x,y]);
+  }
+  const stem = pts.length;
+  if (opt.curl){ const dir = r()<.5?-1:1; let st = step*1.05;
+    for (let j=0;j<26;j++){ h += dir*(0.3+j*0.014); st *= 0.94; x += Math.cos(h)*st; y += Math.sin(h)*st; pts.push([x,y]); } }
+  const nr = pts.map((p,i)=>{ const a=pts[Math.max(0,i-1)], b=pts[Math.min(pts.length-1,i+1)]; const dx=b[0]-a[0], dy=b[1]-a[1]; const l=Math.hypot(dx,dy)||1; return [-dy/l, dx/l]; });
+  return { pts, nr, stem };
+}
+/* Over/under weave: every time a stem enters a stroke it switches layer. */
+function weave(F, pts, start){
+  const lay = new Uint8Array(pts.length); let L = start, prev = true;
+  for (let i=0;i<pts.length;i++){ const s = sampleField(F, pts[i][0], pts[i][1]); const inn = !!(s && s[0] < -0.004);
+    if (inn && !prev) L ^= 1; lay[i] = L; prev = inn; }
+  return lay;
+}
+function wavParams(r, k=1){ return { a1:(0.35+r()*0.6)*k, f1:0.07+r()*0.12, p1:r()*TAU, a2:(0.1+r()*0.3)*k, f2:0.22+r()*0.25, p2:r()*TAU, bend:(r()-.5)*0.03 }; }
+function pick(r, arr, n, score){ let best=null, bs=-Infinity; for (let i=0;i<n;i++){ const q=arr[(r()*arr.length)|0]; const sc=score(q); if (sc>bs){ bs=sc; best=q; } } return best; }
+function genRose(r, big){
+  return { R:(big?0.1:0.07)+Math.pow(r(),1.5)*(big?0.11:0.07), n1:5+(r()*3|0), a1:0.08+r()*0.06, p1:r()*TAU, n2:9+(r()*4|0), a2:0.035+r()*0.03, p2:r()*TAU,
+    spin:r()*TAU, turns:1.7+r()*0.8, lobe:[(r()-.5)*0.5,(r()-.5)*0.5, 0.55+r()*0.25], arcA:r()*TAU, arcB:r()*TAU, n:12+(r()*6|0) };
+}
+function endOf(r, pRose, pBud){ const x=r(); return x<pRose?'flower':x<pRose+pBud?'bud':'curl'; }
+function genLeaves(r, stem, o={}){
+  const out=[]; let i=(o.start||4)+(r()*4|0), side=r()<.5?-1:1;
+  const lenA = o.len||0.1, lenB = o.lenR||0.08, wid = o.wid||0.3, gap = o.gap||6, until = o.until||stem-3;
+  while (i < Math.min(until, stem-2)){ out.push({ i, side, ang:(o.ang||0.45)+r()*0.55, len:lenA+r()*lenB, wid:wid+r()*0.1 }); side=-side; i += gap+(r()*gap|0); }
+  return out;
+}
+function addTwig(F, r, main, lay, opts){
+  const n = main.pts.length, b = Math.max(2, Math.min(main.stem-3, opts.at));
+  const a = main.pts[b-1], c = main.pts[b+1], tang = Math.atan2(c[1]-a[1], c[0]-a[0]), bs = r()<.5?-1:1;
+  const tw = growPath(F, main.pts[b], tang + bs*opts.angle, opts.len, opts.step, opts.wav, { angular:opts.angular, curl:opts.curl }, r);
+  tw.b = b; tw.lay = weave(F, tw.pts, lay[b]); tw.end = opts.end; tw.fl = opts.fl; tw.sph = r(); tw.thin = !!opts.thin; tw.leaves = opts.leaves ? genLeaves(r, tw.stem, opts.leaves) : [];
+  return tw;
+}
+
+/* ---------- Roses: ivy that climbs the letters ---------- */
+function genRosePlant(r, F){
+  const climber = r() < 0.64, wav = wavParams(r), step = 0.026;
+  let root, h0, N, opt = {};
+  if (climber){
+    const e = pick(r, F.edge, 6, q => q[2]);            // outer contour, not a counter
+    const s = sampleField(F, e[0], e[1]) || [0,0,-1], dir = r()<.5?-1:1;
+    root = [e[0], e[1]]; h0 = Math.atan2(s[1]*dir, -s[2]*dir);
+    N = 36 + (r()*44|0); opt = { hug:(N*(0.42+r()*0.3))|0, dir, d0:0.004+r()*0.035 };
+  } else {
+    const up = r() < 0.58, q = pick(r, F.ink, 14, p => up ? -p[1] : p[1]);
+    root = [q[0], q[1]]; h0 = (up ? -Math.PI/2 : Math.PI/2) + (r()<.5?-1:1)*(0.3+r()*0.9);
+    N = 26 + (r()*42|0);
+  }
+  const end = endOf(r, 0.58, 0.14);
+  const main = growPath(F, root, h0, N, step, wav, { ...opt, curl:end==='curl' }, r);
+  const front = r() < 0.45, lay = weave(F, main.pts, front ? 1 : 0), twigs = [];
+  if (N > 28 && r() < 0.75){ const bEnd = endOf(r, 0.45, 0.25);
+    twigs.push(addTwig(F, r, main, lay, { at:Math.floor(N*(0.35+r()*0.35)), angle:0.55+r()*0.6, len:10+(r()*16|0), step:step*0.9,
+      wav:{ a1:wav.a1*0.6, f1:wav.f1*1.3, p1:r()*TAU, a2:wav.a2*0.5, f2:wav.f2, p2:r()*TAU, bend:wav.bend }, curl:bEnd==='curl', end:bEnd, fl:genRose(r,false), leaves:{} })); }
+  const nt = r() < 0.6 ? 1 + (r() < 0.35 ? 1 : 0) : 0;           // little corkscrew tendrils
+  for (let t=0;t<nt;t++) twigs.push(addTwig(F, r, main, lay, { at:Math.floor(N*(0.25+r()*0.6)), angle:0.7+r()*0.6, len:3+(r()*5|0), step:step*0.8, wav:wavParams(r,0.5), curl:true, end:'curl', thin:true }));
+  return { kind:'rose', main, lay, twigs, end, fl:genRose(r,true), leaves:genLeaves(r, main.stem), blooms:[], grass:[], ph:r()*TAU, delay:r(), sph:r(), wMul:1 };
+}
+
+/* ---------- Blossom: angular branches, clustered five-petal flowers ---------- */
+function genSakura(r, s=1){ return { R:(0.05+r()*0.035)*s, spin:r()*TAU }; }
+function genBlossomPlant(r, F){
+  const up = r() < 0.55, q = pick(r, F.ink, 12, p => up ? -p[1] : p[1]), side = r()<.5?-1:1;
+  const h0 = (up ? -Math.PI/2 : Math.PI/2) + side*(0.55+r()*0.75), N = 20 + (r()*32|0), step = 0.03;
+  const main = growPath(F, [q[0],q[1]], h0, N, step, null, { angular:true }, r);
+  const lay = weave(F, main.pts, r()<0.42 ? 1 : 0), twigs = [], blooms = [];
+  const nt = 1 + (r()*3|0);
+  for (let t=0;t<nt;t++) twigs.push(addTwig(F, r, main, lay, { at:4+(r()*(N-8)|0), angle:0.45+r()*0.6, len:5+(r()*11|0), step:step*0.85, angular:true, end:'sakura', fl:genSakura(r) }));
+  const clusters = 2 + (r()*4|0);
+  for (let c=0;c<clusters;c++){ const i = Math.floor(N*(0.3+r()*0.7)); const m = 1+(r()*3|0);
+    for (let j=0;j<m;j++) blooms.push({ on:-1, i, dx:(r()-.5)*0.11, dy:(r()-.5)*0.11, kind:r()<0.8?'sakura':'sbud', fl:genSakura(r, 0.9), sph:r() }); }
+  twigs.forEach((tw, ti) => { const m = r()<0.7 ? 1+(r()*2|0) : 0; for (let j=0;j<m;j++) blooms.push({ on:ti, i:tw.stem-1, dx:(r()-.5)*0.1, dy:(r()-.5)*0.1, kind:r()<0.75?'sakura':'sbud', fl:genSakura(r,0.85), sph:r() }); });
+  return { kind:'blossom', main, lay, twigs, end:'sakura', fl:genSakura(r,1.15), leaves:genLeaves(r, main.stem, { start:6, len:0.05, lenR:0.03, gap:9, wid:0.36 }), blooms, grass:[], ph:r()*TAU, delay:r(), sph:r(), wMul:2.1 };
+}
+
+/* ---------- Meadow: grass tufts and wildflowers rising from the letters ---------- */
+function genMeadowPlant(r, F){
+  const q = pick(r, F.ink, 16, p => p[1]), step = 0.026, N = 14 + (r()*50|0);
+  const wav = { a1:0.08+r()*0.16, f1:0.05+r()*0.06, p1:r()*TAU, a2:0.03+r()*0.05, f2:0.2+r()*0.2, p2:r()*TAU, bend:(r()-.5)*0.012 };
+  const x = r(), end = x<0.42 ? 'daisy' : x<0.74 ? 'poppy' : x<0.86 ? 'bud' : 'none';
+  const main = growPath(F, [q[0],q[1]], -Math.PI/2 + (r()-.5)*0.75, N, step, wav, {}, r);
+  const lay = weave(F, main.pts, r()<0.35 ? 1 : 0), twigs = [];
+  if (N > 30 && r() < 0.35){ const e2 = r()<0.6 ? 'daisy' : 'bud';
+    twigs.push(addTwig(F, r, main, lay, { at:Math.floor(N*(0.35+r()*0.3)), angle:0.3+r()*0.35, len:8+(r()*12|0), step, wav:{ ...wav, p1:r()*TAU }, end:e2, fl:{ R:0.06+r()*0.035, n:11+(r()*5|0), spin:r()*TAU } })); }
+  const grass = []; const nb = 2 + (r()*4|0);
+  for (let b=0;b<nb;b++) grass.push({ dx:(r()-.5)*0.18, h:0.06+Math.pow(r(),1.6)*0.22, lean:(r()-.5)*1.2, w:0.018+r()*0.012, ph:r()*TAU });
+  return { kind:'meadow', main, lay, twigs, end, fl:{ R:0.075+r()*0.06, n:11+(r()*6|0), spin:r()*TAU }, leaves:genLeaves(r, main.stem, { start:2, len:0.16, lenR:0.1, gap:7, wid:0.16, ang:0.25, until:Math.max(6, main.stem*0.5) }), blooms:[], grass, ph:r()*TAU, delay:r(), sph:r(), wMul:0.8 };
+}
+
+/* Plants per letter: a seeded pool, of which a random-density share is shown. */
+const plantCache = new Map();
+function lettersPlants(ch, k){
+  const key = [S.seed, S.style, S.font, k, ch].join('|');
+  if (plantCache.has(key)) return plantCache.get(key);
+  const F = glyphField(ch), r = mulberry32(hash(S.seed, S.style, k, ch)), out = { plants:[], bias:r() };
+  if (!F.empty){ const gen = S.style==='blossom' ? genBlossomPlant : S.style==='meadow' ? genMeadowPlant : genRosePlant;
+    for (let p=0;p<8;p++) out.plants.push(gen(r, F)); }
+  plantCache.set(key, out); return out;
+}
+function plantCount(n, bias){
+  const styleK = S.style==='meadow' ? 1.35 : S.style==='blossom' ? 0.8 : 1;
+  const base = clamp(14/Math.max(n,2), 1, 4.2) * S.density * styleK;
+  return clamp(Math.round(base*(0.55 + bias*0.9)), 0, 8);
+}
+function looseBlooms(W,H){
+  const r = mulberry32(hash(S.seed,'loose',W,H)), out=[], n = 6 + (r()*6|0);
+  for (let i=0;i<n;i++) out.push({ x:0.08+r()*0.84, y:r()<.5 ? 0.06+r()*0.24 : 0.7+r()*0.24, fl:genRose(r,r()<.4), sk:genSakura(r,1.3), ph:r(), leaf:r()*TAU });
+  return out;
+}
+
+/* ---------- layout: the word sits centred in whatever frame it's given ---------- */
+const mcv = document.createElement('canvas'), mctx = mcv.getContext('2d');
+let layoutCache = null;
+function layout(W,H){
+  const key = [S.word, S.font, S.style, W, H, fontsReady].join('|');
+  if (layoutCache && layoutCache.key===key) return layoutCache;
+  const word = S.word || ' ';
+  mctx.font = fontCss(100);
+  const w100 = Math.max(mctx.measureText(word).width, 1);
+  let fs = Math.min((W*(H > W*1.2 ? 0.74 : 0.64)) / (w100/100), H*0.27, W*0.4);
+  mctx.font = fontCss(fs);
+  const tw = mctx.measureText(word).width, off = [];
+  for (let k=0;k<=word.length;k++) off.push(mctx.measureText(word.slice(0,k)).width);
+  // a meadow grows upward, so the word sits lower to give the flowers sky
+  layoutCache = { key, fs, x0:(W-tw)/2, base:H*0.5 + fs*(S.style==='meadow' ? 0.62 : 0.3), off, tw, font:fontCss(fs) };
+  return layoutCache;
+}
+
+/* =========================================================
+   Motion: per-frame parameters, all periodic in u ∈ [0,1).
+   ========================================================= */
+function motionFrame(u, W, H, fs, live){
+  const id = S.motion, M = { id, u, W, H, fs, sway:0.02, cycles:1, light:null, rot:0.06 };
+  if (id==='static'){ M.sway=0; M.rot=0; M.cycles=0; M.still=true; }
+  if (id==='breathe'){ M.sway=0.045; M.rot=0.1; }
+  if (id==='gust'){ M.sway=0.014; M.cycles=2; M.gustX = W*(-0.4 + 1.8*u); M.gustAmp=0.3; }
+  if (id==='reach'){ M.sway=0.014; M.cycles=2;
+    let lx = W*0.5 + Math.min(W*0.33, fs*2.2)*Math.sin(TAU*u), ly = H*0.5 - fs*0.25 + Math.min(H*0.25, fs*1.3)*Math.sin(2*TAU*u+0.5);
+    if (live && pointer.active && performance.now()-pointer.t < 2500){ lx = pointer.x; ly = pointer.y; }
+    M.light = [lx,ly]; }
+  if (id==='visitor') M.cycles = 2;
+  return M;
+}
+function gustEnv(M, x){ const d=(x-M.gustX)/(Math.max(M.W*0.2, M.fs*1.2)); return Math.exp(-d*d); }
+function displace(px,py,nx,ny,s,ph,M){
+  let dx=0, dy=0;
+  const w = Math.pow(s,1.6) * M.sway*M.fs * Math.sin(TAU*M.u*M.cycles + ph + s*1.4);
+  dx += nx*w; dy += ny*w;
+  if (M.gustX!==undefined){ const k = Math.pow(s,1.3)*M.gustAmp*M.fs*gustEnv(M,px); dx += k; dy -= k*0.22; }
+  if (M.light){ const lx=M.light[0]-px, ly=M.light[1]-py, d=Math.hypot(lx,ly)+1e-3;
+    const pull = Math.pow(s,2) * Math.min(0.38*M.fs, d*0.5) * clamp(1 - d/(M.fs*5)); dx += lx/d*pull; dy += ly/d*pull; }
+  return [dx,dy];
+}
+function motionGrow(M, pl, k, n){
+  if (M.id==='grow'){ const v = fract(M.u - pl.delay*0.1);
+    return v<0.4 ? easeInOut(v/0.4) : v<0.62 ? 1 : v<0.95 ? 1-easeInOut((v-0.62)/0.33) : 0; }
+  if (M.id==='typed'){ const t = typedTimes(k,n), v = M.u;
+    if (v < t.on) return 0; if (v < t.off) return easeOut(clamp((v-t.on)/0.22)); return 1-clamp((v-t.off)/0.05); }
+  return 1;
+}
+function typedTimes(k,n){ return { on: 0.04 + (k/Math.max(n,1))*0.42, off: 0.78 + ((n-1-k)/Math.max(n,1))*0.13 }; }
+function typedCount(u,n){ let c=0; for (let k=0;k<n;k++){ const t=typedTimes(k,n); if (u>=t.on && u<t.off) c=k+1; } return c; }
+function scatterBloom(phase, u){ const v = fract(u + phase);
+  return v<0.22 ? easeBack(v/0.22) : v<0.6 ? 1 : v<0.8 ? 1-easeIn((v-0.6)/0.2) : 0; }
+
+/* =========================================================
+   Drawing primitives
+   ========================================================= */
+function strokeRuns(ctx, D, vis, lay, pass){
+  const n = Math.min(D.length-1, vis); if (n <= 0) return;
+  const whole = Math.floor(n), frac = n-whole; let open = false;
+  ctx.beginPath();
+  for (let i=1;i<=whole;i++){ if (lay[i]===pass){ if (!open){ ctx.moveTo(D[i-1][0],D[i-1][1]); open=true; } ctx.lineTo(D[i][0],D[i][1]); } else open=false; }
+  if (frac>0 && whole+1<D.length && lay[whole+1]===pass){ if (!open) ctx.moveTo(D[whole][0],D[whole][1]); ctx.lineTo(lerp(D[whole][0],D[whole+1][0],frac), lerp(D[whole][1],D[whole+1][1],frac)); }
+  ctx.stroke();
+}
+function tangentAt(D,i){ const a=D[Math.max(0,i-1)], b=D[Math.min(D.length-1,i+1)]; return Math.atan2(b[1]-a[1], b[0]-a[0]); }
+function drawLeaf(ctx, x,y, ang, len, wid, P){
+  if (len < 0.5) return;
+  ctx.save(); ctx.translate(x,y); ctx.rotate(ang);
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.quadraticCurveTo(len*0.42, -len*wid, len, 0); ctx.quadraticCurveTo(len*0.42, len*wid, 0, 0);
+  ctx.fillStyle = P.vine; ctx.fill();
+  ctx.strokeStyle = rgba(P.bg, 0.5); ctx.lineWidth = Math.max(0.6, len*0.045); ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(len*0.14,0); ctx.lineTo(len*0.8,0); ctx.stroke();
+  ctx.restore();
+}
+function roseBlob(ctx, r, rs, ox, oy){
+  ctx.beginPath();
+  for (let j=0;j<=56;j++){ const a=j/56*TAU, rr = r*(1 + rs.a1*Math.sin(rs.n1*a+rs.p1) + rs.a2*Math.sin(rs.n2*a+rs.p2));
+    const x=ox+Math.cos(a)*rr, y=oy+Math.sin(a)*rr; j?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+  ctx.closePath();
+}
+function drawRose(ctx, x,y, R, rot, rs, bloom, P, alpha=1){
+  if (bloom <= 0.001) return; const r = R*bloom; if (r < 0.6) return;
+  ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x,y); ctx.rotate(rot + rs.spin + (1-Math.min(bloom,1))*0.8);
+  roseBlob(ctx, r*rs.lobe[2], rs, rs.lobe[0]*r, rs.lobe[1]*r); ctx.fillStyle = P.shade; ctx.fill();
+  roseBlob(ctx, r, rs, 0, 0); ctx.fillStyle = P.flower; ctx.fill();
+  const da = clamp((bloom-0.4)/0.45);
+  if (da > 0){
+    ctx.globalAlpha = alpha*da; ctx.strokeStyle = P.detail; ctx.lineWidth = Math.max(0.8, r*0.075); ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.beginPath(); const T = rs.turns*TAU;
+    for (let j=0;j<=64;j++){ const t=j/64, a=t*T; const rr = r*(0.08 + 0.5*t)*(1+0.24*Math.sin(a*1.7+rs.p2)+0.08*Math.sin(a*4.1+rs.p1));
+      const px=Math.cos(a)*rr + r*0.08*Math.sin(t*5+rs.p1), py=Math.sin(a)*rr*0.74 - r*0.05; j?ctx.lineTo(px,py):ctx.moveTo(px,py); }
+    ctx.stroke();
+    for (const base of [rs.arcA, rs.arcB]){ ctx.beginPath();
+      for (let j=0;j<=14;j++){ const a=base+j/14*1.35, rr=r*(0.74+0.06*Math.sin(j*0.9)); const px=Math.cos(a)*rr, py=Math.sin(a)*rr; j?ctx.lineTo(px,py):ctx.moveTo(px,py); }
+      ctx.stroke(); }
+  }
+  ctx.restore();
+}
+function drawBud(ctx, x,y, R, ang, bloom, P){
+  if (bloom <= 0.01) return; const s = R*0.42*bloom;
+  ctx.save(); ctx.translate(x,y); ctx.rotate(ang);
+  ctx.fillStyle = P.vine; ctx.beginPath(); ctx.ellipse(s*0.2, -s*0.42, s*0.55, s*0.2, -0.6, 0, TAU); ctx.ellipse(s*0.2, s*0.42, s*0.55, s*0.2, 0.6, 0, TAU); ctx.fill();
+  ctx.fillStyle = P.flower; ctx.beginPath(); ctx.ellipse(s*0.75, 0, s*0.78, s*0.5, 0, 0, TAU); ctx.fill();
+  ctx.restore();
+}
+function petalPath(ctx, L){
+  ctx.beginPath(); ctx.moveTo(0,0);
+  ctx.bezierCurveTo(L*0.16,-L*0.38, L*0.7,-L*0.44, L*0.96,-L*0.15); ctx.lineTo(L*0.8,0); ctx.lineTo(L*0.96,L*0.15);
+  ctx.bezierCurveTo(L*0.7,L*0.44, L*0.16,L*0.38, 0,0); ctx.closePath();
+}
+function drawSakura(ctx, x,y, R, rot, bloom, P){
+  if (bloom <= 0.01) return;
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot);
+  if (bloom < 0.42){ const s = R*0.62*(0.35 + bloom/0.42*0.65);
+    ctx.fillStyle = P.flower; ctx.beginPath(); ctx.ellipse(s*0.15,0,s*0.62,s*0.46,0,0,TAU); ctx.fill();
+    ctx.fillStyle = P.vine; ctx.beginPath(); ctx.ellipse(-s*0.42,0,s*0.3,s*0.3,0,0,TAU); ctx.fill(); ctx.restore(); return; }
+  const o = easeOut(clamp((bloom-0.42)/0.58)), L = R*(0.6+0.4*o)*Math.max(1,bloom);
+  for (let k=0;k<5;k++){ ctx.save(); ctx.rotate(k*TAU/5 + (1-o)*0.6); petalPath(ctx, L); ctx.fillStyle = P.flower; ctx.fill(); ctx.restore(); }
+  ctx.fillStyle = P.shade; ctx.beginPath(); ctx.arc(0,0,L*0.24,0,TAU); ctx.fill();
+  ctx.strokeStyle = P.detail; ctx.fillStyle = P.detail; ctx.lineWidth = Math.max(0.7, L*0.045); ctx.lineCap='round';
+  for (let k=0;k<7;k++){ const a=k/7*TAU+0.3, ex=Math.cos(a)*L*0.44*o, ey=Math.sin(a)*L*0.44*o;
+    ctx.beginPath(); ctx.moveTo(Math.cos(a)*L*0.08, Math.sin(a)*L*0.08); ctx.lineTo(ex,ey); ctx.stroke();
+    ctx.beginPath(); ctx.arc(ex,ey,Math.max(0.8,L*0.05),0,TAU); ctx.fill(); }
+  ctx.restore();
+}
+function drawDaisy(ctx, x,y, R, rot, fl, bloom, P){
+  if (bloom <= 0.01) return; const r = R*Math.max(bloom,0.0001), o = clamp(bloom/0.85), n = fl.n||13;
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.fillStyle = P.flower;
+  for (let k=0;k<n;k++){ ctx.save(); ctx.rotate(k/n*TAU + (1-o)*0.4); ctx.beginPath(); ctx.ellipse(r*0.16 + r*0.42*o, 0, Math.max(0.5,r*0.44*o), r*0.12, 0, 0, TAU); ctx.fill(); ctx.restore(); }
+  ctx.fillStyle = P.detail; ctx.beginPath(); ctx.arc(0,0,r*0.27,0,TAU); ctx.fill();
+  ctx.fillStyle = P.shade; for (let j=0;j<7;j++){ const a=j/7*TAU; ctx.beginPath(); ctx.arc(Math.cos(a)*r*0.13, Math.sin(a)*r*0.13, Math.max(0.6,r*0.035), 0, TAU); ctx.fill(); }
+  ctx.restore();
+}
+function drawPoppy(ctx, x,y, R, rot, fl, bloom, P){
+  if (bloom <= 0.01) return; const r = R*1.05*bloom, o = clamp(bloom);
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot);
+  for (const k of [1,3,0,2]){ const a = k*TAU/4 + 0.4, cx = Math.cos(a)*r*0.36*o, cy = Math.sin(a)*r*0.36*o;
+    ctx.fillStyle = k%2 ? P.shade : P.flower; ctx.beginPath(); ctx.ellipse(cx, cy, r*0.6, r*0.54, a, 0, TAU); ctx.fill(); }
+  ctx.fillStyle = P.ink; ctx.beginPath(); ctx.arc(0,0,r*0.2,0,TAU); ctx.fill();
+  ctx.strokeStyle = P.ink; ctx.lineWidth = Math.max(0.7, r*0.03); ctx.lineCap='round';
+  for (let j=0;j<11;j++){ const a=j/11*TAU; ctx.beginPath(); ctx.moveTo(Math.cos(a)*r*0.2, Math.sin(a)*r*0.2); ctx.lineTo(Math.cos(a)*r*0.36*o, Math.sin(a)*r*0.36*o); ctx.stroke(); }
+  ctx.restore();
+}
+function drawFlower(ctx, kind, x,y, R, tang, extraRot, fl, bloom, P){
+  if (kind==='flower' || kind==='rose') drawRose(ctx, x,y, R, tang+extraRot, fl, bloom, P);
+  else if (kind==='bud') drawBud(ctx, x,y, R, tang, bloom, P);
+  else if (kind==='sakura') drawSakura(ctx, x,y, R, fl.spin+extraRot*0.5, bloom, P);
+  else if (kind==='sbud') drawSakura(ctx, x,y, R, tang, Math.min(bloom, 0.36), P);
+  else if (kind==='daisy') drawDaisy(ctx, x,y, R, fl.spin+extraRot, fl, bloom, P);
+  else if (kind==='poppy') drawPoppy(ctx, x,y, R, fl.spin+extraRot, fl, bloom, P);
+}
+const isBloom = k => k==='flower'||k==='rose'||k==='sakura'||k==='daisy'||k==='poppy';
+
+/* Place a plant's geometry for this frame: displaced points and growth progress. */
+function placePlant(pl, O, fs, M, g){
+  const n = pl.main.pts.length, D = new Array(n);
+  for (let i=0;i<n;i++){ const p=pl.main.pts[i], nr=pl.main.nr[i]; const px=O[0]+p[0]*fs, py=O[1]+p[1]*fs;
+    const d = displace(px,py,nr[0],nr[1], i/(n-1), pl.ph, M); D[i]=[px+d[0],py+d[1]]; }
+  const out = { pl, D, g, visMain: clamp(g/0.72)*(n-1), endBloom: easeBack(clamp((g-0.66)/0.34)), T:[] };
+  for (const tw of pl.twigs){ const m = tw.pts.length, E = new Array(m), base = D[tw.b], b0 = [O[0]+tw.pts[0][0]*fs, O[1]+tw.pts[0][1]*fs];
+    for (let j=0;j<m;j++){ const p=tw.pts[j], nr=tw.nr[j]; const px=O[0]+p[0]*fs, py=O[1]+p[1]*fs;
+      const d = displace(px,py,nr[0],nr[1], (j/Math.max(1,m-1))*0.7, pl.ph+1.3, M);
+      E[j] = [base[0] + (px-b0[0]) + d[0], base[1] + (py-b0[1]) + d[1]]; }
+    const bp = clamp((g - 0.72*(tw.b/(n-1)))/0.3);
+    out.T.push({ E, vis: bp*(m-1), bloom: easeBack(clamp((bp-0.6)/0.4)) }); }
+  return out;
+}
+function flowerRot(M, ph, x){
+  let r = M.rot*Math.sin(TAU*M.u*M.cycles + ph + 1);
+  if (M.gustX!==undefined) r += 0.7*gustEnv(M,x);
+  if (M.light) r += 0.15*Math.sin(TAU*M.u + ph);
+  return r;
+}
+function drawGrass(ctx, it, M, P){
+  const pl = it.pl, fs = M.fs, root = it.D[0], gg = easeOut(clamp(it.g*1.5));
+  ctx.fillStyle = P.vine;
+  for (const b of pl.grass){ const h = b.h*fs*gg; if (h < 1) continue;
+    const bx = root[0] + b.dx*fs, by = root[1] + fs*0.015, tx0 = bx + b.lean*h*0.45, ty0 = by - h;
+    const d = displace(tx0, ty0, 1, 0, 1, pl.ph + b.ph, M), k = h/(fs*0.4);
+    const tx = tx0 + d[0]*k, ty = ty0 + d[1]*k, w = b.w*fs;
+    ctx.beginPath(); ctx.moveTo(bx - w/2, by);
+    ctx.quadraticCurveTo(bx + (tx-bx)*0.2 - w*0.15, by - h*0.55, tx, ty);
+    ctx.quadraticCurveTo(bx + (tx-bx)*0.2 + w*0.45, by - h*0.5, bx + w/2, by);
+    ctx.fill(); }
+}
+function drawPlant(ctx, it, M, P, pass, spots){
+  const { pl, D } = it, fs = M.fs, w = Math.max(1, fs*0.013*pl.wMul), lay = pl.lay;
+  ctx.strokeStyle = P.vine; ctx.lineCap='round'; ctx.lineJoin='round';
+  if (pl.grass.length && lay[0]===pass) drawGrass(ctx, it, M, P);
+  if (it.visMain <= 0) return;
+  // stem, tapered toward the tip
+  if (pl.kind==='blossom'){ ctx.lineWidth = w*0.38; strokeRuns(ctx, D, it.visMain, lay, pass);
+    ctx.lineWidth = w*0.68; strokeRuns(ctx, D, Math.min(it.visMain, pl.main.stem*0.6), lay, pass);
+    ctx.lineWidth = w; strokeRuns(ctx, D, Math.min(it.visMain, pl.main.stem*0.28), lay, pass); }
+  else { ctx.lineWidth = w*0.72; strokeRuns(ctx, D, it.visMain, lay, pass);
+    ctx.lineWidth = w; strokeRuns(ctx, D, Math.min(it.visMain, pl.main.stem*0.45), lay, pass); }
+  pl.twigs.forEach((tw, ti) => { const t = it.T[ti]; if (t.vis <= 0) return;
+    ctx.lineWidth = w*(tw.thin ? 0.42 : pl.kind==='blossom' ? 0.34 : 0.62); strokeRuns(ctx, t.E, t.vis, tw.lay, pass); });
+  // leaves
+  for (const lf of pl.leaves){ if (lay[lf.i]!==pass) continue; const sc = clamp((it.visMain - lf.i)/3); if (sc<=0) continue;
+    drawLeaf(ctx, D[lf.i][0], D[lf.i][1], tangentAt(D, lf.i) + lf.side*lf.ang, lf.len*fs*easeOut(sc), lf.wid, P); }
+  pl.twigs.forEach((tw, ti) => { const t = it.T[ti];
+    for (const lf of tw.leaves){ if (tw.lay[lf.i]!==pass) continue; const sc = clamp((t.vis - lf.i)/3); if (sc<=0) continue;
+      drawLeaf(ctx, t.E[lf.i][0], t.E[lf.i][1], tangentAt(t.E, lf.i) + lf.side*lf.ang, lf.len*fs*0.9*easeOut(sc), lf.wid, P); } });
+  const scatter = M.id==='scatter';
+  // twig ends
+  pl.twigs.forEach((tw, ti) => { if (tw.end==='curl') return; const t = it.T[ti], last = Math.min(tw.stem-1, t.E.length-1);
+    if (tw.lay[last]!==pass) return; const q = t.E[last];
+    let bloom = t.bloom; if (scatter) bloom = Math.min(bloom, scatterBloom(tw.sph, M.u));
+    drawFlower(ctx, tw.end, q[0],q[1], tw.fl.R*fs, tangentAt(t.E,last), flowerRot(M,pl.ph+2,q[0]), tw.fl, bloom, P);
+    if (isBloom(tw.end) && t.bloom > 0.5) spots.push({ x:q[0], y:q[1], R:tw.fl.R*fs }); });
+  // clustered blooms along branches
+  for (const b of pl.blooms){ const path = b.on < 0 ? D : it.T[b.on].E, vis = b.on < 0 ? it.visMain : it.T[b.on].vis, L = b.on < 0 ? lay : pl.twigs[b.on].lay;
+    const i = Math.min(b.i, path.length-1); if (L[i]!==pass) continue;
+    let bloom = easeBack(clamp((vis - i)/5)); if (scatter) bloom = Math.min(bloom, scatterBloom(b.sph, M.u)); if (bloom<=0.01) continue;
+    const x = path[i][0] + b.dx*fs, y = path[i][1] + b.dy*fs;
+    drawFlower(ctx, b.kind, x, y, b.fl.R*fs, tangentAt(path,i), flowerRot(M, pl.ph+b.sph*5, x), b.fl, bloom, P);
+    if (b.kind==='sakura' && bloom > 0.5) spots.push({ x, y, R:b.fl.R*fs }); }
+  // main end
+  if (pl.end!=='curl' && pl.end!=='none'){ const last = pl.main.stem-1; if (lay[last]!==pass) return; const q = D[last];
+    let bloom = it.endBloom; if (scatter) bloom = Math.min(bloom, scatterBloom(pl.sph, M.u));
+    const breathe = 1 + 0.045*Math.sin(TAU*M.u*M.cycles + pl.ph + 0.7);
+    drawFlower(ctx, pl.end, q[0],q[1], pl.fl.R*fs*breathe, tangentAt(D,last), flowerRot(M,pl.ph,q[0]), pl.fl, bloom, P);
+    if (isBloom(pl.end) && it.endBloom > 0.5) spots.push({ x:q[0], y:q[1], R:pl.fl.R*fs }); }
+}
+
+function drawLight(ctx, M, P){
+  const [x,y] = M.light, r = M.fs*0.06;
+  ctx.save();
+  ctx.fillStyle = rgba(P.flower, 0.14); ctx.beginPath(); ctx.arc(x,y,r*3.2,0,TAU); ctx.fill();
+  ctx.fillStyle = rgba(P.flower, 0.24); ctx.beginPath(); ctx.arc(x,y,r*1.9,0,TAU); ctx.fill();
+  ctx.fillStyle = P.flower; ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.fill();
+  ctx.restore();
+}
+function drawPetals(ctx, M, P){
+  const r = mulberry32(hash(S.seed,'petals')), env = Math.sin(Math.PI*M.u);
+  for (let i=0;i<22;i++){
+    const ox=(r()-.5)*0.5*M.W, y0=M.H*(0.18+0.64*r()), sz=M.fs*(0.028+0.02*r()), sp=r()<.5?-1:1, ph=r()*TAU;
+    const x = M.gustX + ox + M.W*0.06*Math.sin(TAU*M.u*2+ph), y = y0 + M.fs*0.3*Math.sin(TAU*M.u*2+ph) + M.H*0.08*M.u;
+    if (x < -sz*4 || x > M.W+sz*4) continue;
+    ctx.save(); ctx.globalAlpha = clamp(env*1.6); ctx.translate(x,y); ctx.rotate(sp*TAU*M.u*3+ph); ctx.scale(1, Math.abs(Math.cos(TAU*M.u*4+ph))*0.8+0.2);
+    ctx.fillStyle = P.flower; ctx.beginPath(); ctx.moveTo(-sz,0); ctx.quadraticCurveTo(0,-sz*0.9,sz,0); ctx.quadraticCurveTo(0,sz*0.9,-sz,0); ctx.fill(); ctx.restore();
+  }
+}
+/* Blossom only: petals drift down in every motion, one fall per loop so it stays seamless. */
+function drawFalling(ctx, M, P){
+  const r = mulberry32(hash(S.seed,'fall')), n = 14, u = M.still ? 0.37 : M.u;
+  for (let i=0;i<n;i++){
+    const x0 = r()*M.W, ph = r(), sz = M.fs*(0.04+0.02*r()), sw = r()*TAU, sp = r()<.5?-1:1;
+    const v = fract(u + ph), y = -0.08*M.H + v*1.16*M.H;
+    let x = x0 + Math.sin(TAU*u*2 + sw)*M.fs*0.35;
+    if (M.gustX!==undefined) x += M.fs*0.8*gustEnv(M, x0);
+    ctx.save(); ctx.translate(x,y); ctx.rotate(sp*TAU*u*2 + sw); ctx.scale(1, 0.35 + 0.65*Math.abs(Math.cos(TAU*u*3 + sw)));
+    petalPath(ctx, sz); ctx.fillStyle = P.flower; ctx.fill(); ctx.restore();
+  }
+}
+function bez(a,b,c,d,t){ const m=1-t; return [m*m*m*a[0]+3*m*m*t*b[0]+3*m*t*t*c[0]+t*t*t*d[0], m*m*m*a[1]+3*m*m*t*b[1]+3*m*t*t*c[1]+t*t*t*d[1]]; }
+function drawButterfly(ctx, M, P, spots){
+  const W=M.W, H=M.H, u=M.u, L=layout(W,H);
+  const near = spots.filter(s => Math.abs(s.x - W/2) < L.tw*0.45);
+  const pool = near.length ? near : spots;
+  const T = pool.length ? (p => [p.x, p.y - p.R*0.35])(pool.slice().sort((a,b)=>a.y-b.y)[0]) : [W*0.5, L.base - M.fs*0.78];
+  const P0=[-0.12*W, H*0.2], P3=[1.12*W, H*0.1];
+  let pos, tilt=0;
+  const flight = (a,b,c,d,t)=>{ const p=bez(a,b,c,d,t), q=bez(a,b,c,d,Math.min(1,t+0.01)); tilt = clamp((q[0]-p[0])/(M.fs*0.05),-1,1)*0.35; return p; };
+  if (u < 0.38){ const t=easeInOut(u/0.38); pos = flight(P0,[W*0.2,H*0.04],[T[0]-W*0.18,T[1]-H*0.22],T,t); pos[1] += Math.sin(TAU*u*9)*M.fs*0.05*(1-t); }
+  else if (u < 0.66){ pos = T; }
+  else { const t=easeIn((u-0.66)/0.34); pos = flight(T,[T[0]+W*0.1,T[1]-H*0.3],[W*0.86,0],P3,t); pos[1] += Math.sin(TAU*u*9)*M.fs*0.05*t; }
+  const fast = 0.18 + 0.82*Math.abs(Math.sin(TAU*u*14)), slow = 0.62 + 0.38*Math.sin(TAU*u*3);
+  const open = lerp(fast, slow, clamp(Math.min((u-0.34)/0.06, (0.7-u)/0.06)));
+  const s = Math.max(40, M.fs*0.44);
+  ctx.save(); ctx.translate(pos[0], pos[1]); ctx.rotate(tilt);
+  for (const side of [-1,1]){
+    ctx.save(); ctx.scale(side*open, 1);
+    ctx.fillStyle = P.shade; ctx.beginPath(); ctx.moveTo(0,s*0.02); ctx.bezierCurveTo(s*0.32,s*0.05,s*0.46,s*0.38,s*0.3,s*0.5); ctx.bezierCurveTo(s*0.16,s*0.58,s*0.04,s*0.32,0,s*0.12); ctx.fill();
+    ctx.fillStyle = P.flower; ctx.beginPath(); ctx.moveTo(0,-s*0.04); ctx.bezierCurveTo(s*0.14,-s*0.6,s*0.62,-s*0.62,s*0.56,-s*0.16); ctx.bezierCurveTo(s*0.52,s*0.02,s*0.2,s*0.04,0,s*0.04); ctx.fill();
+    ctx.fillStyle = P.detail; ctx.beginPath(); ctx.arc(s*0.34,-s*0.3,s*0.075,0,TAU); ctx.arc(s*0.22,s*0.3,s*0.05,0,TAU); ctx.fill();
+    ctx.restore();
+  }
+  ctx.fillStyle = P.ink; ctx.beginPath(); ctx.ellipse(0, s*0.04, s*0.035, s*0.3, 0, 0, TAU); ctx.fill();
+  ctx.strokeStyle = P.ink; ctx.lineWidth = Math.max(1, s*0.018); ctx.lineCap='round';
+  for (const side of [-1,1]){ ctx.beginPath(); ctx.moveTo(0,-s*0.24); ctx.quadraticCurveTo(side*s*0.06,-s*0.42,side*s*0.16,-s*0.5); ctx.stroke(); }
+  ctx.restore();
+}
+
+/* ---------- live-only state: per-letter birth times, per-plant visibility smoothing ---------- */
+let births = [];
+const visMap = new Map();
+let lastNow = performance.now(), frameDt = 16;
+function liveGrow(k, now){ const b = births[k]; if (b===undefined) return 1; return easeOut(clamp((now-b)/1800)); }
+function liveVis(key, target){
+  let v = visMap.get(key); if (v===undefined){ visMap.set(key, target); return target; }
+  v += (target - v) * (1 - Math.exp(-frameDt/340)); if (Math.abs(target-v) < 0.002) v = target;
+  visMap.set(key, v); return v;
+}
+function resprout(stagger=110){ const now = performance.now(); births = [...S.word].map((_,k)=> now + k*stagger); }
+
+/* =========================================================
+   Render one frame into ctx at W×H pixels (the frame recomposes to fit).
+   ========================================================= */
+function render(ctx, W, H, u, live, now, transparent){
+  const base = PAL(), P = { ...base, shade: mix(base.flower, '#000000', 0.13) };
+  const L = layout(W,H), fs = L.fs, word = S.word, n = word.length;
+  const M = motionFrame(u, W, H, fs, live);
+  if (transparent) ctx.clearRect(0,0,W,H); else { ctx.fillStyle = P.bg; ctx.fillRect(0,0,W,H); }
+  const items = [];
+  for (let k=0;k<n;k++){
+    const ch = word[k], lp = lettersPlants(ch, k), want = plantCount(n, lp.bias);
+    for (let p=0;p<lp.plants.length;p++){
+      const target = p < want ? 1 : 0;
+      const vis = live ? liveVis([S.seed,S.style,S.font,k,ch,p].join('|'), target) : target;
+      if (vis <= 0.001) continue;
+      const pl = lp.plants[p];
+      let g = motionGrow(M, pl, k, n) * vis;
+      if (live) g *= liveGrow(k, now);
+      if (g <= 0) continue;
+      items.push(placePlant(pl, [L.x0 + L.off[k], L.base], fs, M, g));
+    }
+  }
+  if (M.light) drawLight(ctx, M, P);
+  if (M.id==='scatter'){
+    for (const b of looseBlooms(W,H)){ const bl = scatterBloom(b.ph, u); if (bl<=0) continue;
+      const x=b.x*W, y=b.y*H;
+      if (S.style==='blossom') drawSakura(ctx, x, y, b.sk.R*fs, b.sk.spin, bl, P);
+      else if (S.style==='meadow') drawDaisy(ctx, x, y, b.fl.R*fs*0.9, b.fl.spin, b.fl, bl, P);
+      else { drawLeaf(ctx, x, y, b.leaf, b.fl.R*fs*1.6*clamp(bl), 0.34, P); drawRose(ctx, x, y, b.fl.R*fs, Math.sin(TAU*u+b.ph*TAU)*0.1, b.fl, bl, P); } }
+  }
+  const spots = [];
+  for (const it of items) drawPlant(ctx, it, M, P, 0, spots);
+  ctx.font = L.font; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = P.ink;
+  const shown = M.id==='typed' ? typedCount(u, n) : n;
+  ctx.fillText(word.slice(0, shown), L.x0, L.base);
+  let caret = false;
+  if (M.id==='typed') caret = (u>0.5 && u<0.78) ? fract(u*5)<0.5 : (u>0.02 && u<0.94);
+  else if (live && editing) caret = (now % 1060) < 560;
+  if (caret){ ctx.fillStyle = P.ink; ctx.fillRect(L.x0 + L.off[shown] + fs*0.05, L.base - fs*0.74, Math.max(1.5, fs*0.016), fs*0.92); }
+  for (const it of items) drawPlant(ctx, it, M, P, 1, spots);
+  if (S.style==='blossom') drawFalling(ctx, M, P);
+  if (M.gustX!==undefined) drawPetals(ctx, M, P);
+  if (M.id==='visitor') drawButterfly(ctx, M, P, spots);
+}
+</script>
+<script>
+/* =========================================================
+   App: live preview, controls, export.
+   ========================================================= */
+try { const saved = JSON.parse(localStorage.getItem('bloomtype.v2') || 'null'); if (saved) Object.assign(S, saved); } catch(e) {}
+function persist(){ try { localStorage.setItem('bloomtype.v2', JSON.stringify(S)); } catch(e) {} if (codeOpen) refreshCode(); }
+
+/* Intensity sets the garden's fullness; each regrow adds a little randomness around it. */
+if (typeof S.intensity !== 'number') S.intensity = 0.45;
+if (typeof S.jitter !== 'number') S.jitter = 1;
+function densityOf(){ return +(lerp(0.3, 2.4, Math.pow(S.intensity, 1.1)) * S.jitter).toFixed(3); }
+S.density = densityOf();
+function intensityName(v){ return v < 0.15 ? 'A few sprigs' : v < 0.38 ? 'Light' : v < 0.62 ? 'Lush' : v < 0.85 ? 'Abundant' : 'Overgrown'; }
+
+/* Live preview: the canvas fills the stage; nothing is cropped. */
+const app = document.getElementById('app'), stage = document.getElementById('stage'), cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+const wordEl = document.getElementById('word'), scrub = document.getElementById('scrub'), frameOut = document.getElementById('frameOut');
+let playing = true, uNow = 0, tPrev = performance.now(), scrubbing = false, codeOpen = false, codeKind = 'html';
+let view = { W:1000, H:800, dpr:1 };
+
+function sizeCanvas(){
+  const r = stage.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const W = Math.max(1, Math.round(r.width)), H = Math.max(1, Math.round(r.height));
+  cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+  view = { W, H, dpr };
+  updateMeta();
+}
+new ResizeObserver(sizeCanvas).observe(stage);
+
+function tick(now){
+  frameDt = Math.min(64, now - lastNow); lastNow = now;
+  const dur = MOT().dur;
+  if (playing && !document.hidden) uNow = fract(uNow + (now - tPrev)/1000/dur);
+  tPrev = now;
+  ctx.setTransform(view.dpr,0,0,view.dpr,0,0);
+  render(ctx, view.W, view.H, uNow, true, now);
+  const frames = Math.round(dur*FPS), f = Math.min(frames-1, Math.floor(uNow*frames));
+  if (!scrubbing) scrub.value = f;
+  frameOut.textContent = `${f+1} / ${frames}`;
+  updateStats();
+  requestAnimationFrame(tick);
+}
+
+/* stats readout: counts the full garden for a stable number */
+let statsKey = '';
+function updateStats(){
+  const key = [S.seed, S.word, S.density, S.style, S.font].join('|');
+  if (key === statsKey) return; statsKey = key;
+  const n = S.word.length; let plants=0, flowers=0, buds=0, curls=0, leaves=0;
+  const tally = k => { if (isBloom(k)) flowers++; else if (k==='bud'||k==='sbud') buds++; else if (k==='curl') curls++; };
+  for (let k=0;k<n;k++){ const lp = lettersPlants(S.word[k], k), want = plantCount(n, lp.bias);
+    for (let p=0;p<Math.min(want, lp.plants.length);p++){ const pl = lp.plants[p]; plants++; leaves += pl.leaves.length + pl.grass.length; tally(pl.end);
+      for (const tw of pl.twigs){ leaves += tw.leaves.length; tally(tw.end); } for (const b of pl.blooms) tally(b.kind); } }
+  const leafNoun = S.style==='meadow' ? 'leaves & blades' : 'leaves';
+  document.getElementById('stats').innerHTML =
+    `<span><b>${plants}</b> plants</span><span><b>${flowers}</b> ${STY().noun}</span><span><b>${buds}</b> buds</span><span><b>${leaves}</b> ${leafNoun}</span>${curls?`<span><b>${curls}</b> tendrils</span>`:''}`;
+}
+
+/* ---------- intensity meter ---------- */
+const intensityEl = document.getElementById('intensity'), intensityOut = document.getElementById('intensityOut');
+function showIntensity(){ const pct = Math.round(S.intensity*100); intensityEl.value = pct; intensityEl.style.setProperty('--p', pct+'%');
+  intensityOut.textContent = `${intensityName(S.intensity)} · ${pct}%`; intensityEl.setAttribute('aria-valuetext', `${intensityName(S.intensity)}, ${pct} percent`); }
+intensityEl.addEventListener('input', () => { S.intensity = +intensityEl.value/100; S.density = densityOf(); statsKey = ''; showIntensity(); });
+intensityEl.addEventListener('change', persist);
+showIntensity();
+
+/* ---------- word editing ---------- */
+function setWord(next){
+  next = next.replace(/[\r\n\t]/g,'').slice(0,16);
+  const prev = S.word, now = performance.now(), nb = [];
+  for (let k=0;k<next.length;k++) nb[k] = (prev[k]===next[k] && births[k]!==undefined) ? births[k] : now;
+  births = nb; S.word = next; layoutCache = null; persist();
+}
+wordEl.value = S.word;
+wordEl.addEventListener('input', () => setWord(wordEl.value));
+wordEl.addEventListener('focus', () => { editing = true; });
+wordEl.addEventListener('blur', () => { editing = false; });
+stage.addEventListener('pointerdown', (e) => {
+  if (e.target.closest('.float')) return;
+  wordEl.focus({ preventScroll:true }); const l = wordEl.value.length; wordEl.setSelectionRange(l,l);
+});
+cv.addEventListener('pointermove', (e) => { const r = cv.getBoundingClientRect(); pointer.x = e.clientX - r.left; pointer.y = e.clientY - r.top; pointer.t = performance.now(); pointer.active = true; });
+cv.addEventListener('pointerleave', () => { pointer.active = false; });
+
+/* ---------- regrow: new seed, new random density ---------- */
+function regrow(){
+  S.seed = (Math.random()*1e9)>>>0;
+  S.jitter = +(0.82 + Math.random()*0.36).toFixed(3);                 // random, but near the chosen intensity
+  S.density = densityOf();
+  plantCache.clear(); visMap.clear(); resprout(90); persist(); statsKey = '';
+  const b = document.getElementById('regrow'); b.classList.remove('spin'); void b.offsetWidth; b.classList.add('spin');
+}
+document.getElementById('regrow').addEventListener('click', regrow);
+
+/* ---------- controls ---------- */
+function radioGroup(el, items, current, renderItem, onPick, cls='card'){
+  el.innerHTML = '';
+  items.forEach((it) => { const b = document.createElement('button'); b.type='button'; b.setAttribute('role','radio');
+    b.setAttribute('aria-checked', String(it.id===current())); b.innerHTML = renderItem(it); if (cls) b.className = cls;
+    b.addEventListener('click', async () => { [...el.children].forEach(c=>c.setAttribute('aria-checked','false')); b.setAttribute('aria-checked','true'); await onPick(it); });
+    el.appendChild(b); });
+  const cols = () => getComputedStyle(el).gridTemplateColumns.split(' ').length;
+  el.addEventListener('keydown', (e) => { const btns=[...el.children], i=btns.indexOf(document.activeElement); if (i<0) return;
+    const c = cols(), step = {ArrowRight:1,ArrowLeft:-1,ArrowDown:c,ArrowUp:-c}[e.key]; if (!step) return;
+    e.preventDefault(); const j=(i+step+btns.length)%btns.length; btns[j].focus(); btns[j].click(); });
+}
+radioGroup(document.getElementById('styles'), STYLES, () => S.style,
+  s => `<span class="glyph">${s.icon}</span><span class="t">${s.name}</span><span class="d">${s.desc}</span>`,
+  s => { S.style = s.id; visMap.clear(); resprout(); persist(); statsKey=''; });
+radioGroup(document.getElementById('fonts'), FONTS, () => S.font,
+  f => `<span class="face" style="font-family:'${f.family}',${f.fb};font-weight:${f.weight}">${f.name}</span><span class="d">${f.family==='Pinyon Script'?'Script':f.family==='Bricolage Grotesque'?'Grotesque':'Serif'}</span>`,
+  async f => { try { await document.fonts.load(fontCss(100, f)); } catch(e){} S.font = f.id; layoutCache = null; visMap.clear(); resprout(); persist(); statsKey=''; });
+radioGroup(document.getElementById('motions'), MOTIONS, () => S.motion,
+  m => `<span class="t">${m.name}</span><span class="d">${m.desc} · ${m.dur}s</span>`,
+  m => { S.motion = m.id; uNow = 0; persist(); updateMeta(); });
+radioGroup(document.getElementById('palettes'), PALETTES, () => S.palette,
+  p => `<span class="swatch" style="background:${p.bg}"><span class="dots"><i style="background:${p.flower}"></i><i style="background:${p.vine}"></i></span><span style="color:${p.ink}">Aa</span></span><span class="n">${p.name}</span>`,
+  p => { S.palette = p.id; persist(); applyPalette(); });
+radioGroup(document.getElementById('ratios'), RATIOS, () => S.ratio, r => r.label, r => { S.ratio = r.id; persist(); updateMeta(); }, '');
+
+function applyPalette(){ stage.style.setProperty('--stage', PAL().bg); }
+function exportDims(){
+  const r = RATIOS.find(x=>x.id===S.ratio) || RATIOS[0];
+  if (r.wh) return r.wh;
+  const a = view.W / view.H, long = 1920;           // Full: exactly the stage's framing, long side 1920
+  return a >= 1 ? [long, Math.max(2, Math.round(long/a/2)*2)] : [Math.max(2, Math.round(long*a/2)*2), long];
+}
+function updateMeta(){
+  const m = MOT(), frames = Math.round(m.dur*FPS), [W,H] = exportDims();
+  document.getElementById('meta').textContent = m.still ? 'Still poster' : `${m.dur}s loop · ${FPS} fps`;
+  scrub.max = frames-1;
+  document.querySelector('.transport').hidden = !!m.still;
+  document.getElementById('xmp4d').textContent = m.still ? `${W}×${H} · ${m.dur}s hold` : `${W}×${H} · ${m.dur}s`;
+  document.getElementById('xpngd').textContent = m.still ? `1 PNG, ${W}×${H}` : `${frames} PNGs, zipped`;
+}
+
+/* ---------- transport ---------- */
+const playBtn = document.getElementById('play'), playIcon = document.getElementById('playIcon');
+function setPlaying(v){ playing = v; tPrev = performance.now();
+  playBtn.setAttribute('aria-label', v ? 'Pause' : 'Play');
+  playIcon.innerHTML = v ? '<rect x="4" y="3" width="2.6" height="10" rx="1"/><rect x="9.4" y="3" width="2.6" height="10" rx="1"/>' : '<path d="M5 3.2v9.6c0 .6.6.9 1.1.6l7.4-4.8c.5-.3.5-.9 0-1.2L6.1 2.6C5.6 2.3 5 2.6 5 3.2z"/>'; }
+playBtn.addEventListener('click', () => setPlaying(!playing));
+scrub.addEventListener('pointerdown', () => { scrubbing = true; setPlaying(false); });
+scrub.addEventListener('pointerup', () => { scrubbing = false; });
+scrub.addEventListener('input', () => { setPlaying(false); const frames = +scrub.max+1; uNow = (+scrub.value + 0.5)/frames; });
+
+const toggleBtn = document.getElementById('togglePanel');
+function togglePanel(){ const c = app.classList.toggle('collapsed'); toggleBtn.setAttribute('aria-label', c ? 'Show controls' : 'Hide controls'); }
+toggleBtn.addEventListener('click', togglePanel);
+document.addEventListener('keydown', (e) => {
+  if (e.target === wordEl || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === ' ' && !(e.target instanceof HTMLButtonElement) && e.target.type !== 'range'){ e.preventDefault(); setPlaying(!playing); }
+  else if (e.key === '\\') togglePanel();
+  else if (e.key === 'r' || e.key === 'R') regrow();
+});
+
+/* =========================================================
+   Export: deterministic, frame by frame (never real-time).
+   Each ratio recomposes the poster to its own frame, so nothing is cut.
+   ========================================================= */
+let downloadsCap = null;
+if (window.claude && typeof window.claude.use === 'function'){ window.claude.use('downloads').then(d => { downloadsCap = d; }).catch(() => {}); }
+const scriptOnce = {};
+function loadScript(src){ return scriptOnce[src] || (scriptOnce[src] = new Promise((res, rej) => { const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=()=>{ delete scriptOnce[src]; rej(new Error('could not load the encoder')); }; document.head.appendChild(s); })); }
+const progress = document.getElementById('progress'), pbar = document.getElementById('pbar'), ptext = document.getElementById('ptext'), xnote = document.getElementById('xnote');
+const xBtns = [document.getElementById('xmp4'), document.getElementById('xpng')];
+function busy(on, text){ xBtns.forEach(b=>b.disabled=on); progress.classList.toggle('on', on); if (text) ptext.textContent = text; if (!on) pbar.style.width='0'; }
+function note(msg){ xnote.hidden = !msg; xnote.textContent = msg || ''; }
+const yieldFrame = () => new Promise(r => setTimeout(r, 0));
+function fileBase(){ const w = (S.word||'poster').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'poster'; return `${w}-${S.style}-${S.motion}-${S.palette}-${S.ratio.replace(':','x')}`; }
+
+async function saveFile(name, blob){
+  if (downloadsCap){
+    try { await downloadsCap.save({ filename:name, data:blob }); return 'Saved '+name; }
+    catch(e){ if (e && e.code === 'declined') return 'Save cancelled.'; if (e && e.code === 'rate_limited') return 'Another save is still open. Finish it, then export again.'; if (e && e.code === 'too_large') return 'That file is too large to save here. Try a smaller ratio.'; }
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 5000);
+  return 'Saved '+name;
+}
+function exportCanvas(){ const [W,H] = exportDims(); const c = document.createElement('canvas'); c.width=W; c.height=H; return { c, W, H, x:c.getContext('2d') }; }
+
+async function exportPNG(){
+  note(''); busy(true, 'Preparing…');
+  try {
+    await loadScript('https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js');
+    const { c, W, H, x } = exportCanvas(), frames = MOT().still ? 1 : Math.round(MOT().dur*FPS), files = {}, base = fileBase();
+    for (let i=0;i<frames;i++){
+      render(x, W, H, i/frames, false, 0, transparentOn());
+      const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+      files[`${base}/${base}-${String(i+1).padStart(4,'0')}.png`] = [new Uint8Array(await blob.arrayBuffer()), { level:0 }];
+      pbar.style.width = ((i+1)/frames*92)+'%'; ptext.textContent = `Rendering frame ${i+1} of ${frames}`;
+    }
+    ptext.textContent = 'Zipping…'; await yieldFrame();
+    const zip = fflate.zipSync(files); pbar.style.width = '100%';
+    note(await saveFile(base+'-frames.zip', new Blob([zip], { type:'application/zip' })));
+  } catch(e){ note('Export failed: '+(e && e.message ? e.message : e)+'. Try again, or try the MP4.'); }
+  busy(false);
+}
+async function pickCodec(W,H){
+  if (!('VideoEncoder' in window)) return null;
+  for (const codec of ['avc1.640033','avc1.640028','avc1.4D0033','avc1.42E033','avc1.42001f']){
+    try { const s = await VideoEncoder.isConfigSupported({ codec, width:W, height:H, bitrate:12e6, framerate:FPS }); if (s.supported) return codec; } catch(e){}
+  }
+  return null;
+}
+async function exportMP4(){
+  note(''); busy(true, 'Preparing…');
+  try {
+    const { c, W, H, x } = exportCanvas(), frames = Math.round(MOT().dur*FPS);
+    const codec = await pickCodec(W,H);
+    if (!codec){ busy(false); return exportWebM(); }
+    await loadScript('https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.js');
+    const muxer = new Mp4Muxer.Muxer({ target:new Mp4Muxer.ArrayBufferTarget(), video:{ codec:'avc', width:W, height:H, frameRate:FPS }, fastStart:'in-memory' });
+    let err = null;
+    const enc = new VideoEncoder({ output:(chunk, meta) => muxer.addVideoChunk(chunk, meta), error:(e) => { err = e; } });
+    enc.configure({ codec, width:W, height:H, bitrate:14e6, framerate:FPS, avc:{ format:'avc' } });
+    for (let i=0;i<frames;i++){
+      if (err) throw err;
+      render(x, W, H, i/frames, false, 0);
+      const vf = new VideoFrame(c, { timestamp:Math.round(i*1e6/FPS), duration:Math.round(1e6/FPS) });
+      enc.encode(vf, { keyFrame: i % FPS === 0 }); vf.close();
+      while (enc.encodeQueueSize > 6) await new Promise(r => setTimeout(r, 4));
+      pbar.style.width = ((i+1)/frames*95)+'%'; ptext.textContent = `Encoding frame ${i+1} of ${frames}`;
+      if (i % 4 === 0) await yieldFrame();
+    }
+    await enc.flush(); enc.close(); if (err) throw err;
+    muxer.finalize(); pbar.style.width = '100%';
+    note(await saveFile(fileBase()+'.mp4', new Blob([muxer.target.buffer], { type:'video/mp4' })));
+  } catch(e){ note('Export failed: '+(e && e.message ? e.message : e)+'. Try PNG frames instead.'); }
+  busy(false);
+}
+async function exportWebM(){
+  busy(true, 'This browser has no MP4 encoder. Recording a WebM in real time…');
+  try {
+    const { c, W, H, x } = exportCanvas(), dur = MOT().dur, stream = c.captureStream(FPS);
+    const type = ['video/webm;codecs=vp9','video/webm'].find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t));
+    if (!type) throw new Error('video recording is not supported in this browser');
+    const rec = new MediaRecorder(stream, { mimeType:type, videoBitsPerSecond:10e6 }), chunks = [];
+    rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+    const done = new Promise(r => rec.onstop = r); rec.start();
+    const t0 = performance.now();
+    await new Promise(res => { (function step(){ const el=(performance.now()-t0)/1000, u = Math.min(el/dur, 0.9999);
+      render(x, W, H, u, false, 0); pbar.style.width = (u*100)+'%'; ptext.textContent = `Recording ${el.toFixed(1)}s of ${dur}s`;
+      if (el < dur) requestAnimationFrame(step); else res(); })(); });
+    rec.stop(); await done;
+    note(await saveFile(fileBase()+'.webm', new Blob(chunks, { type:'video/webm' })));
+  } catch(e){ note('Export failed: '+(e && e.message ? e.message : e)+'. Try PNG frames instead.'); }
+  busy(false);
+}
+document.getElementById('xmp4').addEventListener('click', exportMP4);
+document.getElementById('xpng').addEventListener('click', exportPNG);
+
+/* ---------- still, HTML file, embed code ---------- */
+const transparentEl = document.getElementById('transparent');
+transparentEl.checked = !!S.transparent;
+transparentEl.addEventListener('change', () => { S.transparent = transparentEl.checked; persist(); });
+function transparentOn(){ return !!transparentEl.checked; }
+
+async function exportStill(){
+  note(''); busy(true, 'Rendering…');
+  try { const { c, W, H, x } = exportCanvas(); render(x, W, H, uNow, false, 0, transparentOn());
+    const blob = await new Promise(r => c.toBlob(r, 'image/png')); pbar.style.width = '100%';
+    note(await saveFile(fileBase()+'-still.png', blob)); }
+  catch(e){ note('Export failed: '+(e && e.message ? e.message : e)+'.'); }
+  busy(false);
+}
+
+const GF = { newsreader:'Newsreader:opsz,wght@6..72,400', playfair:'Playfair+Display:wght@400', instrument:'Instrument+Serif', fraunces:'Fraunces:opsz,wght@9..144,400', bricolage:'Bricolage+Grotesque:opsz,wght@12..96,500', pinyon:'Pinyon+Script' };
+let engineSrc = null;
+function engineSource(){
+  if (engineSrc) return engineSrc;
+  engineSrc = document.getElementById('bloom-engine').textContent.replace(/\/\*[\s\S]*?\*\//g, '').split('\n').map(l => l.trim()).filter(Boolean).join('\n');
+  return engineSrc;
+}
+function embedConfig(){ return { word:S.word, palette:S.palette, motion:S.motion, style:S.style, font:S.font, seed:S.seed, density:S.density }; }
+/* One self-contained function: the engine plus a tiny player. Returns a cleanup function. */
+function runtimeSource(){
+  const t = transparentOn();
+  return `function mountBloomType(host){
+${engineSource()}
+Object.assign(S, ${JSON.stringify(embedConfig())});
+fontsReady = true;
+var cv = document.createElement('canvas'); cv.setAttribute('aria-hidden', 'true'); cv.style.cssText = 'display:block;width:100%;height:100%';
+host.appendChild(cv);
+var cx = cv.getContext('2d'), W = 0, H = 0, dpr = 1, raf = 0, seen = true, ready = false, t0 = performance.now(), dur = MOT().dur;
+var still = !!MOT().still || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+function draw(now){ if (!ready || !W) return; cx.setTransform(dpr, 0, 0, dpr, 0, 0); render(cx, W, H, still ? 0.5 : fract((now - t0) / 1000 / dur), false, 0, ${t}); }
+function size(){ var r = host.getBoundingClientRect(); dpr = Math.min(window.devicePixelRatio || 1, 2); W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height)); cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); draw(performance.now()); }
+function loop(now){ if (seen) draw(now); raf = requestAnimationFrame(loop); }
+var ro = new ResizeObserver(size); ro.observe(host);
+var io = new IntersectionObserver(function(e){ seen = e[0].isIntersecting; }); io.observe(host);
+var href = 'https://fonts.googleapis.com/css2?family=${GF[S.font] || GF.newsreader}&display=swap';
+if (!document.querySelector('link[href="' + href + '"]')){ var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = href; document.head.appendChild(l); }
+function start(){ if (ready) return; ready = true; fieldCache.clear(); plantCache.clear(); layoutCache = null; size(); if (!still) raf = requestAnimationFrame(loop); }
+var tries = 0;
+(function waitFont(){ document.fonts.load(fontCss(100)).then(function(f){ if (f.length || ++tries > 40) start(); else setTimeout(waitFont, 100); }, start); })();
+var fallback = setTimeout(start, 4000);
+return function(){ clearTimeout(fallback); cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); cv.remove(); };
+}`;
+}
+function describe(){ return `"${S.word}" · ${STY().name} · ${FNT().name} · ${MOT().name} · ${PAL().name}`; }
+function aspectCss(){ const [W,H] = exportDims(); return `${W} / ${H}`; }
+function htmlSnippet(){
+  const id = 'bloomtype-' + (S.seed % 1e6).toString(36), bg = transparentOn() ? 'transparent' : PAL().bg;
+  return `<!-- BloomType poster: ${describe()} -->
+<div id="${id}" role="img" aria-label="${S.word.replace(/"/g,'&quot;')}" style="width:100%;aspect-ratio:${aspectCss()};background:${bg}"></div>
+<script>
+(function(){
+${runtimeSource()}
+mountBloomType(document.getElementById('${id}'));
+})();
+<\/script>`;
+}
+function reactSnippet(){
+  const bg = transparentOn() ? 'transparent' : PAL().bg;
+  return `// BloomType poster: ${describe()}
+// Drop this file into a React or Next.js project. It renders on the client only.
+import { useEffect, useRef } from "react";
+
+export default function BloomTypePoster({ className, style }) {
+  const ref = useRef(null);
+  useEffect(() => mountBloomType(ref.current), []);
+  return (
+    <div
+      ref={ref}
+      role="img"
+      aria-label=${JSON.stringify(S.word)}
+      className={className}
+      style={{ width: "100%", aspectRatio: "${aspectCss()}", background: "${bg}", ...style }}
+    />
+  );
+}
+
+${runtimeSource()}
+`;
+}
+const codeOut = document.getElementById('codeOut'), codePanel = document.getElementById('codePanel'), xcode = document.getElementById('xcode');
+function refreshCode(){
+  const code = codeKind === 'react' ? reactSnippet() : htmlSnippet();
+  codeOut.value = code;
+  document.getElementById('codeSize').textContent = `${(new Blob([code]).size/1024).toFixed(1)} KB · ${codeKind === 'react' ? 'BloomTypePoster.jsx' : 'paste anywhere'}`;
+  document.getElementById('codeNote').textContent = codeKind === 'react'
+    ? 'Save as BloomTypePoster.jsx and render <BloomTypePoster />. Size it with className or style.'
+    : 'Paste into Webflow, Framer, WordPress or any HTML page. It draws live, scales to its box and pauses when off screen.';
+}
+xcode.addEventListener('click', () => { codeOpen = !codeOpen; codePanel.hidden = !codeOpen; xcode.setAttribute('aria-expanded', String(codeOpen)); if (codeOpen) refreshCode(); });
+document.querySelectorAll('.tabs [role="tab"]').forEach(t => t.addEventListener('click', () => {
+  codeKind = t.dataset.k; document.querySelectorAll('.tabs [role="tab"]').forEach(x => x.setAttribute('aria-selected', String(x === t))); refreshCode(); }));
+document.getElementById('copyCode').addEventListener('click', async () => {
+  const btn = document.getElementById('copyCode'), label = btn.textContent;
+  try { await navigator.clipboard.writeText(codeOut.value); btn.textContent = 'Copied'; }
+  catch(e){ codeOut.focus(); codeOut.select(); btn.textContent = 'Selected. Press Ctrl/⌘ C'; }
+  setTimeout(() => { btn.textContent = label; }, 1800);
+});
+async function exportHTML(){
+  note('');
+  const bg = transparentOn() ? 'transparent' : PAL().bg;
+  const page = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${S.word.replace(/</g,'&lt;')}</title>
+<style>html,body{margin:0;height:100%;background:${bg}}#bloomtype{width:100%;height:100%}</style>
+</head>
+<body>
+<div id="bloomtype" role="img" aria-label="${S.word.replace(/"/g,'&quot;')}"></div>
+<script>
+(function(){
+${runtimeSource()}
+mountBloomType(document.getElementById('bloomtype'));
+})();
+<\/script>
+</body>
+</html>
+`;
+  note(await saveFile(fileBase()+'.html', new Blob([page], { type:'text/html' })));
+}
+document.getElementById('xstill').addEventListener('click', exportStill);
+document.getElementById('xhtml').addEventListener('click', exportHTML);
+
+/* ---------- boot ---------- */
+applyPalette(); sizeCanvas();
+(async () => {
+  try { await Promise.race([ Promise.all([document.fonts.load(fontCss(100)), document.fonts.load(`500 12px "DM Mono"`)]), new Promise(r => setTimeout(r, 2500)) ]); } catch(e){}
+  fontsReady = true; fieldCache.clear(); plantCache.clear(); layoutCache = null; statsKey = '';
+  const now = performance.now(); births = [...S.word].map((_,k)=> now + 200 + k*110);
+  requestAnimationFrame((t) => { lastNow = tPrev = t; tick(t); });
+  FONTS.forEach(f => { document.fonts.load(fontCss(40, f)).catch(()=>{}); });
+})();
+window.__bloom = { S, render, layout, regrow, setWord, exportDims, RATIOS, fieldCache, plantCache };
+</script>
+</body>
+</html>
