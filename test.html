@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BloomType checks</title>
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; padding: 32px max(16px, 4vw); background: #0A0A0A; color: #EDEAE4; font: 14px/1.5 ui-monospace, "SF Mono", Menlo, monospace; }
+  h1 { font: 600 28px/1.2 Georgia, serif; margin: 0 0 6px; }
+  p { margin: 0 0 20px; color: #8F8B84; }
+  ol { padding-left: 20px; }
+  li { margin: 6px 0; }
+  .pass { color: #8FCF94; } .fail { color: #FF8A7A; }
+  #embeds { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px; max-width: 720px; }
+  iframe { position: absolute; width: 960px; height: 600px; left: -10000px; border: 0; }
+</style>
+</head>
+<body>
+<h1 id="title">Running checks…</h1>
+<p>Serve the folder (for example <code>npx serve .</code>) and open <code>/test.html</code>. Nothing here touches your saved settings.</p>
+<ol id="list"></ol>
+<div id="embeds" aria-label="Two copies of the same embed"></div>
+<iframe id="app" src="index.html" title="BloomType under test"></iframe>
+<script>
+const list = document.getElementById('list');
+const results = [];
+function check(name, ok, detail = '') {
+  results.push(ok);
+  const li = document.createElement('li');
+  li.className = ok ? 'pass' : 'fail';
+  li.textContent = `${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? ' (' + detail + ')' : ''}`;
+  list.appendChild(li);
+}
+
+document.getElementById('app').addEventListener('load', async () => {
+  const win = document.getElementById('app').contentWindow;
+  // wait for the app's fonts and first frame
+  for (let i = 0; i < 100 && !(win.__bloom && win.document.fonts.status === 'loaded'); i++) await new Promise(r => setTimeout(r, 50));
+  const B = win.__bloom, saved = { ...B.S };
+  const c = document.createElement('canvas'); c.width = 480; c.height = 300;
+  const x = c.getContext('2d', { willReadFrequently: true });
+  const frame = u => { x.setTransform(0.5, 0, 0, 0.5, 0, 0); B.render(x, 960, 600, u, false, 0); return x.getImageData(0, 0, 480, 300).data; };
+  const changed = (a, b) => { let d = 0; for (let i = 0; i < a.length; i += 4) if (Math.abs(a[i] - b[i]) + Math.abs(a[i+1] - b[i+1]) + Math.abs(a[i+2] - b[i+2]) > 30) d++; return d / (a.length / 4); };
+
+  // 1. Seamless loops: the jump from the last frame back to the first is no bigger than an ordinary frame step.
+  Object.assign(B.S, { word: 'Growth', seed: 20241031, density: 1, palette: 'paper', font: 'newsreader' });
+  for (const style of ['rose', 'tulip', 'blossom', 'mix']) {
+    B.S.style = style; B.plantCache.clear();
+    for (const motion of ['breathe', 'grow', 'typed', 'gust', 'reach', 'scatter', 'visitor']) {
+      B.S.motion = motion; const f = 1 / 90;
+      const wrap = changed(frame(1 - f), frame(0)), step = Math.max(changed(frame(0.25), frame(0.25 + f)), changed(frame(0.5), frame(0.5 + f)));
+      check(`${style} · ${motion} loops without a seam`, wrap <= step * 1.6 + 0.005, `wrap ${(wrap * 100).toFixed(2)}% vs step ${(step * 100).toFixed(2)}%`);
+    }
+  }
+
+  // 2. Embed code survives a hostile word.
+  B.S.word = '<\/script>"x'; B.S.style = 'rose'; B.S.motion = 'breathe'; B.plantCache.clear();
+  const html = B.htmlSnippet(), react = B.reactSnippet();
+  check('HTML embed has exactly one closing script tag for any word', html.split('<\/script>').length === 2);
+  const firstLine = html.split('\n')[0];
+  check('HTML comment cannot be closed early by the word', firstLine.endsWith(' -->') && firstLine.indexOf('-->') === firstLine.length - 3);
+  check('React label is a JS expression, so quotes compile', /aria-label=\{"(?:[^"\\]|\\.)*"\}/.test(react));
+
+  // 3. Two copies of the same embed each draw into their own box.
+  B.S.word = 'Growth';
+  const twin = B.htmlSnippet(), box = document.getElementById('embeds');
+  box.append(document.createRange().createContextualFragment(twin), document.createRange().createContextualFragment(twin));
+  await new Promise(r => setTimeout(r, 4500));
+  const counts = [...box.querySelectorAll('[role="img"]')].map(d => d.querySelectorAll('canvas').length);
+  check('two embeds on one page each get their own canvas', counts.length === 2 && counts.every(n => n === 1), JSON.stringify(counts));
+
+  Object.assign(B.S, saved); B.plantCache.clear();
+  const ok = results.every(Boolean);
+  document.getElementById('title').textContent = ok ? `All ${results.length} checks pass` : `${results.filter(r => !r).length} of ${results.length} checks fail`;
+  document.title = ok ? 'BloomType checks: pass' : 'BloomType checks: FAIL';
+});
+</script>
+</body>
+</html>
