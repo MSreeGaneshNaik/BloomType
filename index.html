@@ -12,7 +12,8 @@
 <title>BloomType</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500&family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,400&family=Instrument+Serif&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Pinyon+Script&family=Playfair+Display:wght@400&display=swap">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500&family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,400&family=Instrument+Serif&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Pinyon+Script&family=Playfair+Display:wght@400&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500&family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,400&family=Instrument+Serif&family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Pinyon+Script&family=Playfair+Display:wght@400&display=swap"></noscript>
 <style>
 /* Layout: fixed tool panel on the left, full-bleed living poster on the right; panel becomes a bottom sheet on phones. */
 :root{
@@ -43,6 +44,7 @@ button{cursor:pointer}
 .panel{position:relative;z-index:2;background:var(--chrome);overflow:hidden;min-width:0}
 .panel-inner{width:316px;height:100%;box-sizing:border-box;overflow-y:auto;padding:22px 20px 28px;display:flex;flex-direction:column;gap:26px;scrollbar-width:thin;scrollbar-color:#2A2A2A transparent;transition:opacity .3s var(--ease-out),transform .5s var(--ease-out)}
 .app.collapsed .panel-inner{opacity:0;transform:translateX(-24px);pointer-events:none}
+.pending section + section{visibility:hidden} /* cards are built by script; hiding them until then avoids a layout shift */
 .panel-inner::-webkit-scrollbar{width:8px}
 .panel-inner::-webkit-scrollbar-thumb{background:#2A2A2A;border-radius:8px}
 
@@ -50,7 +52,7 @@ button{cursor:pointer}
 .head p{margin:0;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
 
 .group{display:flex;flex-direction:column;gap:10px}
-.label{margin:0;font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.label{margin:0;font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 
 .word{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:10px 14px;font:600 24px/1.2 var(--serif);letter-spacing:-.01em;caret-color:var(--text);transition:border-color .2s}
 .word:focus{outline:none;border-color:var(--edge-strong)}
@@ -65,7 +67,7 @@ button{cursor:pointer}
 .meter{display:flex;flex-direction:column;gap:6px;margin-top:4px}
 .meter-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .meter-row label{font:500 12.5px/1 var(--mono)}
-.meter-row output{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+.meter-row output{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
 .meter input{-webkit-appearance:none;appearance:none;width:100%;height:22px;margin:0;background:transparent;cursor:pointer;--p:45%}
 .meter input::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:linear-gradient(to right,var(--text) var(--p),#2A2A2A var(--p))}
 .meter input::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;background:var(--text);border:3px solid var(--chrome);box-sizing:content-box;transition:transform .15s var(--ease-out)}
@@ -75,18 +77,17 @@ button{cursor:pointer}
 .meter input::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--text);border:3px solid var(--chrome)}
 .meter input:focus-visible{outline:none}
 .meter input:focus-visible::-webkit-slider-thumb{outline:2px solid var(--edge-strong);outline-offset:2px}
-.meter-ends{display:flex;justify-content:space-between;color:#5F5B55;font-size:10.5px}
-.stats{display:flex;flex-wrap:wrap;gap:4px 12px;margin:0;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+.stats{display:flex;flex-wrap:wrap;gap:4px 12px;margin:0;min-height:calc(2.9em + 4px);color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
 .stats b{color:var(--text);font-weight:500}
 
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.grid.three{grid-template-columns:repeat(3,1fr)}
+.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
 .card{position:relative;text-align:left;background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:10px 11px 11px;transition:background .15s,border-color .15s,transform .1s}
 .card:hover{background:var(--card-hover)}
 .card:active{transform:scale(.98)}
 .card[aria-checked="true"]{border-color:var(--edge-strong);box-shadow:inset 0 0 0 .5px var(--edge-strong)}
 .card .t{display:block;font:500 13px/1.2 var(--mono);margin-bottom:4px}
-.card .d{display:block;color:var(--muted);font-size:11.5px;line-height:1.35}
+.card .d{display:block;color:var(--muted);font-size:12px;line-height:1.35}
 .card .face{display:block;font-size:21px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card .face + .d{margin-top:2px}
 
@@ -113,13 +114,13 @@ button{cursor:pointer}
 .xbtn.primary{background:var(--text);color:#0A0A0A;border-color:var(--text)}
 .xbtn.primary:hover{background:#FFFFFF}
 .xbtn .t{display:block;font:500 13px/1.2 var(--mono)}
-.xbtn .d{display:block;font-size:11px;opacity:.62;margin-top:3px;font-variant-numeric:tabular-nums}
+.xbtn .d{display:block;font-size:12px;opacity:.62;margin-top:3px;font-variant-numeric:tabular-nums}
 .xbtn:disabled{opacity:.45;cursor:default;transform:none}
 .progress{display:none;flex-direction:column;gap:7px}
 .progress.on{display:flex}
 .bar{height:4px;background:#222;border-radius:4px;overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:var(--text);border-radius:4px}
-.ptext,.note{margin:0;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+.ptext,.note{margin:0;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
 .xbtn.wide{grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .xbtn.wide svg{width:16px;height:16px;flex:none;opacity:.8}
 .switch{position:relative;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
@@ -130,15 +131,15 @@ button{cursor:pointer}
 .switch input:checked + .track::after{transform:translateX(12px);background:#0A0A0A}
 .switch input:focus-visible + .track{outline:2px solid var(--edge-strong);outline-offset:2px}
 .switch .sl{font-size:12px}
-.switch .sl small{display:block;color:var(--muted);font-size:11px}
+.switch .sl small{display:block;color:var(--muted);font-size:12px}
 .code{display:flex;flex-direction:column;gap:8px}
 .tabs{display:flex;gap:4px}
 .tabs button{background:none;border:0;border-radius:7px;padding:6px 10px;font:500 12px/1 var(--mono);color:var(--muted)}
 .tabs button[aria-selected="true"]{background:#262626;color:var(--text)}
-.code textarea{width:100%;box-sizing:border-box;height:150px;resize:vertical;background:#0F0F0F;border:1px solid var(--edge);border-radius:10px;padding:10px;font:11px/1.5 var(--mono);color:#CFCBC4;white-space:pre;overflow:auto}
+.code textarea{width:100%;box-sizing:border-box;height:150px;resize:vertical;background:#0F0F0F;border:1px solid var(--edge);border-radius:10px;padding:10px;font:12px/1.5 var(--mono);color:#CFCBC4;white-space:pre;overflow:auto}
 .code textarea:focus{outline:none;border-color:var(--edge-strong)}
 .code-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.code-row span{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.code-row span{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
 [hidden]{display:none!important}
 
 /* ---------- stage ---------- */
@@ -151,7 +152,7 @@ button{cursor:pointer}
 .tl{left:14px;top:14px}
 .transport{left:50%;bottom:16px;transform:translateX(-50%);padding:5px 14px 5px 5px;gap:10px}
 .transport input{width:min(240px,38vw);accent-color:#EDEAE4}
-.transport output{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:74px}
+.transport output{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:74px}
 
 @media (max-width:760px){
   body{overflow:auto}
@@ -170,7 +171,7 @@ button{cursor:pointer}
 <body>
 <div class="app" id="app">
   <aside class="panel" id="panel" aria-label="Poster controls">
-    <div class="panel-inner">
+    <div class="panel-inner pending">
       <header class="head">
         <h1>Poster</h1>
         <p id="meta">3s loop · 30 fps</p>
@@ -186,7 +187,6 @@ button{cursor:pointer}
         <div class="meter">
           <div class="meter-row"><label for="intensity">Intensity</label><output id="intensityOut" for="intensity"></output></div>
           <input type="range" id="intensity" min="0" max="100" step="1" value="45">
-          <div class="meter-ends" aria-hidden="true"><span>A few sprigs</span><span>Overgrown</span></div>
         </div>
         <p class="stats" id="stats" aria-live="polite"></p>
       </section>
@@ -272,7 +272,7 @@ const PALETTES = [
   { id:'citrus',    name:'Citrus',    bg:'#0B1410', ink:'#F3ECDC', flower:'#F7931E', detail:'#FFE3AA', vine:'#2EA36A' },
   { id:'orchid',    name:'Orchid',    bg:'#1B0A24', ink:'#F6EEF6', flower:'#E244EC', detail:'#FFC9F6', vine:'#3CB3A2' },
   { id:'moss',      name:'Moss',      bg:'#173A29', ink:'#F1EDE0', flower:'#F3B4BC', detail:'#C8505F', vine:'#8FCF94' },
-  { id:'tomato',    name:'Tomato',    bg:'#F2200F', ink:'#121212', flower:'#F6EDE0', detail:'#F08A7C', vine:'#121212' },
+  { id:'tomato',    name:'Tomato',    bg:'#F2200F', ink:'#0A0A0A', flower:'#F6EDE0', detail:'#F08A7C', vine:'#121212' },
   { id:'butter',    name:'Butter',    bg:'#FBE5A6', ink:'#141414', flower:'#D81F2B', detail:'#FFA3A5', vine:'#1E5B3B' },
 ];
 const MOTIONS = [
@@ -290,7 +290,7 @@ const STYLES = [
     icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M4 30c6-2 7-10 13-12s9 4 14-1" stroke="#97A6F4" stroke-width="1.6" stroke-linecap="round"/><path d="M17 18c-1-3 1-5 3-4" stroke="#97A6F4" stroke-width="1.4" stroke-linecap="round"/><circle cx="32" cy="14" r="6" fill="#F3675B"/><path d="M31 14a1.6 1.6 0 1 1 2 1.5c-1.6.5-3-.6-3-2.2" stroke="#FFD6CB" stroke-width="1.1" stroke-linecap="round"/></svg>' },
   { id:'blossom', name:'Blossom', desc:'Petals fall', noun:'blossoms',
     icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M3 29l9-5 6 1 7-8 5-1 6-6M18 25l3-7" stroke="#97A6F4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><g fill="#F3675B"><circle cx="30" cy="11" r="3"/><circle cx="35" cy="9" r="2.4"/><circle cx="21" cy="16" r="2.6"/></g><circle cx="12" cy="9" r="1.6" fill="#F3675B" opacity=".8"/></svg>' },
-  { id:'meadow',  name:'Meadow',  desc:'Wildflowers', noun:'flowers',
+  { id:'meadow',  name:'Meadow',  desc:'Wild blooms', noun:'flowers',
     icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M6 32c1-6 0-9-2-12M10 32c0-5 2-8 4-10M20 32c0-8-1-14-2-20M30 32c0-6 2-12 3-16" stroke="#97A6F4" stroke-width="1.5" stroke-linecap="round"/><g fill="#F3675B"><circle cx="18" cy="9" r="4.4"/><circle cx="33" cy="13" r="3.4"/></g><circle cx="18" cy="9" r="1.6" fill="#FFD6CB"/><circle cx="33" cy="13" r="1.2" fill="#0C1A4C"/></svg>' },
 ];
 const FONTS = [
@@ -351,7 +351,7 @@ function chamfer(seed, cols, rows){
 function glyphField(ch){
   const f = FNT(), key = f.id+'|'+ch;
   if (fieldCache.has(key)) return fieldCache.get(key);
-  const SZ = 140, G = 2, cw = SZ*2.8, chh = SZ*2.6, ox = SZ*0.7, oy = SZ*1.6;
+  const SZ = 100, G = 2, cw = SZ*2.8, chh = SZ*2.6, ox = SZ*0.7, oy = SZ*1.6;
   const c = document.createElement('canvas'); c.width = cw; c.height = chh;
   const g = c.getContext('2d', { willReadFrequently:true });
   g.font = fontCss(SZ, f); g.textBaseline = 'alphabetic'; g.fillStyle = '#000'; g.fillText(ch, ox, oy);
@@ -495,8 +495,9 @@ function genMeadowPlant(r, F){
 
 /* Plants per letter: a seeded pool, of which a random-density share is shown. */
 const plantCache = new Map();
+const plantKey = (ch, k) => [S.seed, S.style, S.font, k, ch].join('|');
 function lettersPlants(ch, k){
-  const key = [S.seed, S.style, S.font, k, ch].join('|');
+  const key = plantKey(ch, k);
   if (plantCache.has(key)) return plantCache.get(key);
   const F = glyphField(ch), r = mulberry32(hash(S.seed, S.style, k, ch)), out = { plants:[], bias:r() };
   if (!F.empty){ const gen = S.style==='blossom' ? genBlossomPlant : S.style==='meadow' ? genMeadowPlant : genRosePlant;
@@ -822,8 +823,11 @@ function render(ctx, W, H, u, live, now, transparent){
   const M = motionFrame(u, W, H, fs, live);
   if (transparent) ctx.clearRect(0,0,W,H); else { ctx.fillStyle = P.bg; ctx.fillRect(0,0,W,H); }
   const items = [];
+  let budget = live ? 1 : n;
   for (let k=0;k<n;k++){
-    const ch = word[k], lp = lettersPlants(ch, k), want = plantCount(n, lp.bias);
+    const ch = word[k];
+    if (!plantCache.has(plantKey(ch, k)) && budget-- <= 0) continue;
+    const lp = lettersPlants(ch, k), want = plantCount(n, lp.bias);
     for (let p=0;p<lp.plants.length;p++){
       const target = p < want ? 1 : 0;
       const vis = live ? liveVis([S.seed,S.style,S.font,k,ch,p].join('|'), target) : target;
@@ -876,11 +880,12 @@ function intensityName(v){ return v < 0.15 ? 'A few sprigs' : v < 0.38 ? 'Light'
 const app = document.getElementById('app'), stage = document.getElementById('stage'), cv = document.getElementById('cv'), ctx = cv.getContext('2d');
 const wordEl = document.getElementById('word'), scrub = document.getElementById('scrub'), frameOut = document.getElementById('frameOut');
 let playing = true, uNow = 0, tPrev = performance.now(), scrubbing = false, codeOpen = false, codeKind = 'html';
-let view = { W:1000, H:800, dpr:1 };
+let view = { W:0, H:0, dpr:0 };
 
 function sizeCanvas(){
   const r = stage.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
   const W = Math.max(1, Math.round(r.width)), H = Math.max(1, Math.round(r.height));
+  if (W === view.W && H === view.H && dpr === view.dpr) return;   // resizing a canvas is costly; skip no-op calls
   cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
   view = { W, H, dpr };
   updateMeta();
@@ -905,7 +910,8 @@ function tick(now){
 let statsKey = '';
 function updateStats(){
   const key = [S.seed, S.word, S.density, S.style, S.font].join('|');
-  if (key === statsKey) return; statsKey = key;
+  if (key === statsKey || ![...S.word].every((ch, k) => plantCache.has(plantKey(ch, k)))) return;
+  statsKey = key;
   const n = S.word.length; let plants=0, flowers=0, buds=0, curls=0, leaves=0;
   const tally = k => { if (isBloom(k)) flowers++; else if (k==='bud'||k==='sbud') buds++; else if (k==='curl') curls++; };
   for (let k=0;k<n;k++){ const lp = lettersPlants(S.word[k], k), want = plantCount(n, lp.bias);
@@ -925,13 +931,16 @@ intensityEl.addEventListener('change', persist);
 showIntensity();
 
 /* ---------- word editing ---------- */
+// no emoji: pictographs, skin tones, flags, joiners and variation selectors are stripped on input and paste
+const stripEmoji = t => t.replace(/[\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Regional_Indicator}\u200D\uFE0F\u20E3]/gu, '');
 function setWord(next){
-  next = next.replace(/[\r\n\t]/g,'').slice(0,16);
+  next = stripEmoji(next.replace(/[\r\n\t]/g,'')).slice(0,16);
+  if (wordEl.value !== next) wordEl.value = next;
   const prev = S.word, now = performance.now(), nb = [];
   for (let k=0;k<next.length;k++) nb[k] = (prev[k]===next[k] && births[k]!==undefined) ? births[k] : now;
   births = nb; S.word = next; layoutCache = null; persist();
 }
-wordEl.value = S.word;
+S.word = stripEmoji(S.word); wordEl.value = S.word;
 wordEl.addEventListener('input', () => setWord(wordEl.value));
 wordEl.addEventListener('focus', () => { editing = true; });
 wordEl.addEventListener('blur', () => { editing = false; });
@@ -977,6 +986,7 @@ radioGroup(document.getElementById('palettes'), PALETTES, () => S.palette,
   p => `<span class="swatch" style="background:${p.bg}"><span class="dots"><i style="background:${p.flower}"></i><i style="background:${p.vine}"></i></span><span style="color:${p.ink}">Aa</span></span><span class="n">${p.name}</span>`,
   p => { S.palette = p.id; persist(); applyPalette(); });
 radioGroup(document.getElementById('ratios'), RATIOS, () => S.ratio, r => r.label, r => { S.ratio = r.id; persist(); updateMeta(); }, '');
+document.querySelector('.panel-inner').classList.remove('pending');
 
 function applyPalette(){ stage.style.setProperty('--stage', PAL().bg); }
 function exportDims(){
@@ -1247,7 +1257,6 @@ applyPalette(); sizeCanvas();
   fontsReady = true; fieldCache.clear(); plantCache.clear(); layoutCache = null; statsKey = '';
   const now = performance.now(); births = [...S.word].map((_,k)=> now + 200 + k*110);
   requestAnimationFrame((t) => { lastNow = tPrev = t; tick(t); });
-  FONTS.forEach(f => { document.fonts.load(fontCss(40, f)).catch(()=>{}); });
 })();
 window.__bloom = { S, render, layout, regrow, setWord, exportDims, RATIOS, fieldCache, plantCache };
 </script>
