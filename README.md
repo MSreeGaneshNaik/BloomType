@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icon.png" width="128" height="128" alt="BloomType app icon: six rose-red petals on a dark glass tile">
+  <img src="assets/icon.svg" width="128" height="128" alt="The Jericho petal mark: six saffron petals on a white glass tile">
 </p>
 
 <h1 align="center">BloomType <sub>by Jericho</sub></h1>
@@ -45,7 +45,7 @@ Open **[msreeganeshnaik.github.io/BloomType](https://msreeganeshnaik.github.io/B
 | Garden | What grows |
 |---|---|
 | **Roses** | Climbing vines with swirl roses, buds and corkscrew tendrils |
-| **Tulips** | The same climbing vines, crowned with cupped tulips that face along the stem |
+| **Tulips** | Tall stems rising out of the letters, broad folded leaves, and cupped tulips, some flame-tipped, some still in bud |
 | **Daisies** | Climbing vines with open daisies |
 | **Wisteria** | Climbing vines with flower clusters that hang and swing |
 | **Blossom** | Angular branches with clusters of five-petal blossom, and petals that fall in every motion |
@@ -124,7 +124,7 @@ There is no build step and no framework — one HTML file, about 1,300 lines.
 | File | What it does |
 |---|---|
 | [`index.html`](index.html) | The whole app. `<script id="bloom-engine">` is the engine: letter outlines as distance fields, climbing growth, the flowers, the motions and the renderer. The script after it is the editor: the panel, the live preview and every export. The engine is also what the HTML file and embed code ship. |
-| [`assets/`](assets) | The icon and the images in this README |
+| [`assets/`](assets) | The Jericho petal mark as a vector (`icon.svg`, also the favicon) and a 512 px PNG, plus the images in this README |
 | [`.nojekyll`](.nojekyll) | Tells GitHub Pages to serve the files as they are |
 
 ## Good to know
