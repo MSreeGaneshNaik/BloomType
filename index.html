@@ -55,7 +55,7 @@ button{cursor:pointer}
 .group{display:flex;flex-direction:column;gap:10px}
 .label{margin:0;font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 
-.word{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:10px 14px;font:600 24px/1.2 var(--serif);letter-spacing:-.01em;caret-color:var(--text);transition:border-color .2s}
+.word{display:block;width:100%;box-sizing:border-box;resize:none;overflow:hidden;background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:10px 14px;font:600 24px/1.2 var(--serif);letter-spacing:-.01em;caret-color:var(--text);transition:border-color .2s}
 .word:focus{outline:none;border-color:var(--edge-strong)}
 .word::placeholder{color:#55524D}
 
@@ -180,7 +180,7 @@ button{cursor:pointer}
 
       <section class="group" aria-labelledby="l-words">
         <h2 class="label" id="l-words">Words</h2>
-        <input class="word" id="word" type="text" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type a word" aria-label="Word on the poster">
+        <textarea class="word" id="word" rows="1" maxlength="50" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type a word" aria-label="Words on the poster. Enter starts a new line, up to 3 lines."></textarea>
         <button class="btn" id="regrow" type="button" title="Regrow with a new random garden (R)">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.7-4"/><path d="M13.6 2.2v3.2h-3.2"/></svg>
           Regrow garden
@@ -287,18 +287,12 @@ const MOTIONS = [
   { id:'visitor', name:'Visitor',       desc:'Butterfly drops by',  dur:7 },
 ];
 const STYLES = [
-  { id:'rose',    name:'Roses',   desc:'Climbing vines', noun:'roses',
-    icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M4 30c6-2 7-10 13-12s9 4 14-1" stroke="#97A6F4" stroke-width="1.6" stroke-linecap="round"/><path d="M17 18c-1-3 1-5 3-4" stroke="#97A6F4" stroke-width="1.4" stroke-linecap="round"/><circle cx="32" cy="14" r="6" fill="#F3675B"/><path d="M31 14a1.6 1.6 0 1 1 2 1.5c-1.6.5-3-.6-3-2.2" stroke="#FFD6CB" stroke-width="1.1" stroke-linecap="round"/></svg>' },
-  { id:'tulip',   name:'Tulips',  desc:'Tall stems', noun:'tulips',
-    icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M20 33c0-6-1-11 0-16" stroke="#97A6F4" stroke-width="1.6" stroke-linecap="round"/><path d="M20 27c-5-1-8-4-9-8 4 0 8 2 9 8z" fill="#97A6F4"/><path d="M13 5l2.5 5L20 4l4.5 6L27 5c1.5 6 0 11-7 12-7-1-8.5-6-7-12z" fill="#F3675B"/></svg>' },
-  { id:'daisy',   name:'Daisies', desc:'Sunny rays', noun:'daisies',
-    icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M20 33c-1-6 0-12 0-18" stroke="#97A6F4" stroke-width="1.6" stroke-linecap="round"/><g fill="#F3675B" transform="translate(20 11)"><ellipse rx="1.8" ry="4.6" cy="-5"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(45)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(90)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(135)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(180)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(225)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(270)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(315)"/></g><circle cx="20" cy="11" r="3" fill="#FFD6CB"/></svg>' },
-  { id:'wisteria',name:'Wisteria',desc:'Hanging clusters', noun:'clusters',
-    icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M3 6c8 3 14-2 22 1s9 0 12-2" stroke="#97A6F4" stroke-width="1.6" stroke-linecap="round"/><g fill="#F3675B"><circle cx="14" cy="10" r="2.6"/><circle cx="12.5" cy="14.5" r="2.3"/><circle cx="14.5" cy="18.6" r="2"/><circle cx="13" cy="22.4" r="1.6"/><circle cx="14" cy="25.8" r="1.2"/><circle cx="29" cy="10" r="2.4"/><circle cx="30.4" cy="14.2" r="2"/><circle cx="29" cy="18" r="1.6"/></g><g fill="#FFD6CB"><circle cx="13.6" cy="28.6" r=".9"/><circle cx="30" cy="21.2" r="1"/></g></svg>' },
-  { id:'blossom', name:'Blossom', desc:'Petals fall', noun:'blossoms',
-    icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M3 29l9-5 6 1 7-8 5-1 6-6M18 25l3-7" stroke="#97A6F4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><g fill="#F3675B"><circle cx="30" cy="11" r="3"/><circle cx="35" cy="9" r="2.4"/><circle cx="21" cy="16" r="2.6"/></g><circle cx="12" cy="9" r="1.6" fill="#F3675B" opacity=".8"/></svg>' },
-  { id:'mix',     name:'Mixed',   desc:'A bit of all', noun:'flowers',
-    icon:'<svg viewBox="0 0 40 34" fill="none"><path d="M5 31c5-3 7-9 12-11s10 2 15-3" stroke="#97A6F4" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="13" r="4.5" fill="#F3675B"/><path d="M24 9l1.5 3.5 3.5-4 3.5 4L34 9c.5 4-.5 7-5 7.5-4.5-.5-5.5-3.5-5-7.5z" fill="#F3675B"/><g fill="#FFD6CB"><circle cx="31" cy="21" r="1.7"/><circle cx="30" cy="25" r="1.3"/><circle cx="31" cy="28.4" r=".9"/></g></svg>' },
+  { id:'rose',    name:'Roses',   desc:'Climbing vines', noun:'roses', },
+  { id:'tulip',   name:'Tulips',  desc:'Tall stems', noun:'tulips', },
+  { id:'daisy',   name:'Daisies', desc:'Sunny rays', noun:'daisies', },
+  { id:'wisteria',name:'Wisteria',desc:'Hanging clusters', noun:'clusters', },
+  { id:'blossom', name:'Blossom', desc:'Petals fall', noun:'blossoms', },
+  { id:'mix',     name:'Mixed',   desc:'A bit of all', noun:'flowers', },
 ];
 const FONTS = [
   { id:'newsreader', name:'Newsreader',   family:'Newsreader',          weight:400, fb:'Georgia, serif' },
@@ -534,15 +528,19 @@ let layoutCache = null;
 function layout(W,H){
   const key = [S.word, S.font, S.style, W, H, fontsReady].join('|');
   if (layoutCache && layoutCache.key===key) return layoutCache;
-  const word = S.word || ' ';
+  const lines = (S.word || ' ').split('\n'), nl = lines.length, LH = 1.08;   // baseline to baseline, in em
   mctx.font = fontCss(100);
-  const w100 = Math.max(mctx.measureText(word).width, 1);
-  let fs = Math.min((W*(H > W*1.2 ? 0.74 : 0.64)) / (w100/100), H*0.27, W*0.4);
+  const w100 = Math.max(...lines.map(l => mctx.measureText(l || ' ').width), 1);
+  let fs = Math.min((W*(H > W*1.2 ? 0.74 : 0.64)) / (w100/100), H*(nl > 1 ? 0.38 : 0.27) / (1 + (nl-1)*LH*0.85), W*0.4);
   mctx.font = fontCss(fs);
-  const tw = mctx.measureText(word).width, off = [];
-  for (let k=0;k<=word.length;k++) off.push(mctx.measureText(word.slice(0,k)).width);
-  // tulips rise upward, so the word sits lower to give them room
-  layoutCache = { key, fs, x0:(W-tw)/2, base:H*0.5 + fs*(S.style==='tulip' ? 0.55 : 0.3), off, tw, font:fontCss(fs) };
+  // tulips rise upward, so the block sits lower to give them room
+  const base0 = H*0.5 + fs*(S.style==='tulip' ? 0.55 : 0.3) - (nl-1)*fs*LH/2, pos = [], rows = [];
+  let tw = 0, k = 0;
+  lines.forEach((text, li) => { const w = mctx.measureText(text).width, x0 = (W - w)/2, base = base0 + li*fs*LH; tw = Math.max(tw, w);
+    rows.push({ text, x0, base, start:k });
+    for (let j=0;j<=text.length;j++) pos.push([x0 + mctx.measureText(text.slice(0,j)).width, base]);
+    k += text.length + 1; });
+  layoutCache = { key, fs, pos, rows, tw, base:base0, font:fontCss(fs) };
   return layoutCache;
 }
 
@@ -888,7 +886,7 @@ function render(ctx, W, H, u, live, now, transparent){
       let g = motionGrow(M, pl, k, n) * vis;
       if (live) g *= liveGrow(k, now);
       if (g <= 0) continue;
-      items.push(placePlant(pl, [L.x0 + L.off[k], L.base], fs, M, g));
+      items.push(placePlant(pl, L.pos[k], fs, M, g));
     }
   }
   if (M.light) drawLight(ctx, M, P);
@@ -904,11 +902,11 @@ function render(ctx, W, H, u, live, now, transparent){
   for (const it of items) drawPlant(ctx, it, M, P, 0, spots);
   ctx.font = L.font; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = P.ink;
   const shown = M.id==='typed' ? typedCount(u, n) : n;
-  ctx.fillText(word.slice(0, shown), L.x0, L.base);
+  for (const row of L.rows) ctx.fillText(row.text.slice(0, clamp(shown - row.start, 0, row.text.length)), row.x0, row.base);
   let caret = false;
   if (M.id==='typed') caret = (u>0.5 && u<0.78) ? fract(u*5)<0.5 : (u>0.02 && u<0.94);
   else if (live && editing) caret = (now % 1060) < 560;
-  if (caret){ ctx.fillStyle = P.ink; ctx.fillRect(L.x0 + L.off[shown] + fs*0.05, L.base - fs*0.74, Math.max(1.5, fs*0.016), fs*0.92); }
+  if (caret){ const cp = L.pos[Math.min(shown, L.pos.length-1)]; ctx.fillStyle = P.ink; ctx.fillRect(cp[0] + fs*0.05, cp[1] - fs*0.74, Math.max(1.5, fs*0.016), fs*0.92); }
   for (const it of items) drawPlant(ctx, it, M, P, 1, spots);
   if (S.style==='blossom') drawFalling(ctx, M, P);
   if (M.gustX!==undefined) drawPetals(ctx, M, P);
@@ -986,14 +984,16 @@ showIntensity();
 /* ---------- word editing ---------- */
 // no emoji: pictographs, skin tones, flags, joiners and variation selectors are stripped on input and paste
 const stripEmoji = t => t.replace(/[\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Regional_Indicator}\u200D\uFE0F\u20E3]/gu, '');
+const cleanWord = t => stripEmoji(t.replace(/[\r\t]/g,'')).split('\n').slice(0,3).map(l => l.slice(0,16)).join('\n');
 function setWord(next){
-  next = stripEmoji(next.replace(/[\r\n\t]/g,'')).slice(0,16);
-  if (wordEl.value !== next) wordEl.value = next;
+  const raw = next; next = cleanWord(raw);
+  if (wordEl.value !== next){ const at = Math.min(next.length, cleanWord(raw.slice(0, wordEl.selectionStart ?? raw.length)).length);
+    wordEl.value = next; if (document.activeElement === wordEl) wordEl.setSelectionRange(at, at); }
   const prev = S.word, now = performance.now(), nb = [];
   for (let k=0;k<next.length;k++) nb[k] = (prev[k]===next[k] && births[k]!==undefined) ? births[k] : now;
-  births = nb; S.word = next; layoutCache = null; persist();
+  births = nb; S.word = next; layoutCache = null; wordEl.rows = next.split('\n').length; persist();
 }
-S.word = stripEmoji(S.word); wordEl.value = S.word;
+S.word = cleanWord(S.word); wordEl.value = S.word; wordEl.rows = S.word.split('\n').length;
 wordEl.addEventListener('input', () => setWord(wordEl.value));
 wordEl.addEventListener('focus', () => { editing = true; });
 wordEl.addEventListener('blur', () => { editing = false; });
@@ -1015,6 +1015,17 @@ function regrow(){
 document.getElementById('regrow').addEventListener('click', regrow);
 
 /* ---------- controls ---------- */
+// garden card icons live here, not in the engine, so embeds don't carry them
+const STYLE_ICONS = {
+  rose:'<svg viewBox="0 0 40 34" fill="none"><path d="M4 30c6-2 7-10 13-12s9 4 14-1" stroke="#97A6F4" stroke-width="1.6" stroke-linecap="round"/><path d="M17 18c-1-3 1-5 3-4" stroke="#97A6F4" stroke-width="1.4" stroke-linecap="round"/><circle cx="32" cy="14" r="6" fill="#F3675B"/><path d="M31 14a1.6 1.6 0 1 1 2 1.5c-1.6.5-3-.6-3-2.2" stroke="#FFD6CB" stroke-width="1.1" stroke-linecap="round"/></svg>',
+  tulip:'<svg viewBox="0 0 40 34" fill="none"><path d="M20 33c0-6-1-11 0-16" stroke="#97A6F4" stroke-width="1.6" stroke-linecap="round"/><path d="M20 27c-5-1-8-4-9-8 4 0 8 2 9 8z" fill="#97A6F4"/><path d="M13 5l2.5 5L20 4l4.5 6L27 5c1.5 6 0 11-7 12-7-1-8.5-6-7-12z" fill="#F3675B"/></svg>',
+  daisy:'<svg viewBox="0 0 40 34" fill="none"><path d="M20 33c-1-6 0-12 0-18" stroke="#97A6F4" stroke-width="1.6" stroke-linecap="round"/><g fill="#F3675B" transform="translate(20 11)"><ellipse rx="1.8" ry="4.6" cy="-5"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(45)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(90)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(135)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(180)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(225)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(270)"/><ellipse rx="1.8" ry="4.6" cy="-5" transform="rotate(315)"/></g><circle cx="20" cy="11" r="3" fill="#FFD6CB"/></svg>',
+  wisteria:'<svg viewBox="0 0 40 34" fill="none"><path d="M3 6c8 3 14-2 22 1s9 0 12-2" stroke="#97A6F4" stroke-width="1.6" stroke-linecap="round"/><g fill="#F3675B"><circle cx="14" cy="10" r="2.6"/><circle cx="12.5" cy="14.5" r="2.3"/><circle cx="14.5" cy="18.6" r="2"/><circle cx="13" cy="22.4" r="1.6"/><circle cx="14" cy="25.8" r="1.2"/><circle cx="29" cy="10" r="2.4"/><circle cx="30.4" cy="14.2" r="2"/><circle cx="29" cy="18" r="1.6"/></g><g fill="#FFD6CB"><circle cx="13.6" cy="28.6" r=".9"/><circle cx="30" cy="21.2" r="1"/></g></svg>',
+  blossom:'<svg viewBox="0 0 40 34" fill="none"><path d="M3 29l9-5 6 1 7-8 5-1 6-6M18 25l3-7" stroke="#97A6F4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><g fill="#F3675B"><circle cx="30" cy="11" r="3"/><circle cx="35" cy="9" r="2.4"/><circle cx="21" cy="16" r="2.6"/></g><circle cx="12" cy="9" r="1.6" fill="#F3675B" opacity=".8"/></svg>',
+  mix:'<svg viewBox="0 0 40 34" fill="none"><path d="M5 31c5-3 7-9 12-11s10 2 15-3" stroke="#97A6F4" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="13" r="4.5" fill="#F3675B"/><path d="M24 9l1.5 3.5 3.5-4 3.5 4L34 9c.5 4-.5 7-5 7.5-4.5-.5-5.5-3.5-5-7.5z" fill="#F3675B"/><g fill="#FFD6CB"><circle cx="31" cy="21" r="1.7"/><circle cx="30" cy="25" r="1.3"/><circle cx="31" cy="28.4" r=".9"/></g></svg>'
+};
+
+let pendingFont = null;
 function radioGroup(el, items, current, renderItem, onPick, cls='card'){
   el.innerHTML = '';
   items.forEach((it) => { const b = document.createElement('button'); b.type='button'; b.setAttribute('role','radio');
@@ -1027,11 +1038,11 @@ function radioGroup(el, items, current, renderItem, onPick, cls='card'){
     e.preventDefault(); const j=(i+step+btns.length)%btns.length; btns[j].focus(); btns[j].click(); });
 }
 radioGroup(document.getElementById('styles'), STYLES, () => S.style,
-  s => `<span class="glyph">${s.icon}</span><span class="t">${s.name}</span><span class="d">${s.desc}</span>`,
+  s => `<span class="glyph">${STYLE_ICONS[s.id]}</span><span class="t">${s.name}</span><span class="d">${s.desc}</span>`,
   s => { S.style = s.id; visMap.clear(); resprout(); persist(); statsKey=''; });
 radioGroup(document.getElementById('fonts'), FONTS, () => S.font,
   f => `<span class="face" style="font-family:'${f.family}',${f.fb};font-weight:${f.weight}">${f.name}</span><span class="d">${f.family==='Pinyon Script'?'Script':f.family==='Bricolage Grotesque'?'Grotesque':'Serif'}</span>`,
-  async f => { try { await document.fonts.load(fontCss(100, f)); } catch(e){} S.font = f.id; layoutCache = null; visMap.clear(); resprout(); persist(); statsKey=''; });
+  async f => { pendingFont = f.id; try { await document.fonts.load(fontCss(100, f)); } catch(e){} if (pendingFont !== f.id) return; S.font = f.id; layoutCache = null; visMap.clear(); resprout(); persist(); statsKey=''; });
 radioGroup(document.getElementById('motions'), MOTIONS, () => S.motion,
   m => `<span class="t">${m.name}</span><span class="d">${m.desc} · ${m.dur}s</span>`,
   m => { S.motion = m.id; uNow = 0; persist(); updateMeta(); });
@@ -1074,29 +1085,33 @@ document.addEventListener('keydown', (e) => {
   if (e.target === wordEl || e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.key === ' ' && !(e.target instanceof HTMLButtonElement) && e.target.type !== 'range'){ e.preventDefault(); setPlaying(!playing); }
   else if (e.key === '\\') togglePanel();
-  else if (e.key === 'r' || e.key === 'R') regrow();
+  else if ((e.key === 'r' || e.key === 'R') && !exporting) regrow();
 });
 
 /* =========================================================
    Export: deterministic, frame by frame (never real-time).
    Each ratio recomposes the poster to its own frame, so nothing is cut.
    ========================================================= */
-let downloadsCap = null;
-if (window.claude && typeof window.claude.use === 'function'){ window.claude.use('downloads').then(d => { downloadsCap = d; }).catch(() => {}); }
+// resolves to the viewer's download capability inside Claude, or null on a normal website
+const downloadsReady = (window.claude && typeof window.claude.use === 'function') ? window.claude.use('downloads').catch(() => null) : Promise.resolve(null);
 const scriptOnce = {};
 function loadScript(src){ return scriptOnce[src] || (scriptOnce[src] = new Promise((res, rej) => { const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=()=>{ delete scriptOnce[src]; rej(new Error('could not load the encoder')); }; document.head.appendChild(s); })); }
 const progress = document.getElementById('progress'), pbar = document.getElementById('pbar'), ptext = document.getElementById('ptext'), xnote = document.getElementById('xnote');
 const xBtns = [document.getElementById('xmp4'), document.getElementById('xpng')];
-function busy(on, text){ xBtns.forEach(b=>b.disabled=on); progress.classList.toggle('on', on); if (text) ptext.textContent = text; if (!on) pbar.style.width='0'; }
+let exporting = false;
+function busy(on, text){ exporting = on; document.querySelectorAll('.panel-inner > section:not(:last-child)').forEach(sec => { sec.inert = on; }); xBtns.forEach(b=>b.disabled=on); progress.classList.toggle('on', on); if (text) ptext.textContent = text; if (!on) pbar.style.width='0'; }
 function note(msg){ xnote.hidden = !msg; xnote.textContent = msg || ''; }
 const yieldFrame = () => new Promise(r => setTimeout(r, 0));
 function fileBase(){ const w = (S.word||'poster').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'poster'; return `${w}-${S.style}-${S.motion}-${S.palette}-${S.ratio.replace(':','x')}`; }
 
 async function saveFile(name, blob){
-  if (downloadsCap){
-    try { await downloadsCap.save({ filename:name, data:blob }); return 'Saved '+name; }
-    catch(e){ if (e && e.code === 'declined') return 'Save cancelled.'; if (e && e.code === 'rate_limited') return 'Another save is still open. Finish it, then export again.'; if (e && e.code === 'too_large') return 'That file is too large to save here. Try a smaller ratio.'; }
+  const cap = await downloadsReady;
+  if (cap){
+    try { await cap.save({ filename:name, data:blob }); return 'Saved '+name; }
+    catch(e){ if (e && e.code === 'declined') return 'Save cancelled.'; if (e && e.code === 'rate_limited') return 'Another save is still open. Finish it, then export again.'; if (e && e.code === 'too_large') return 'That file is too large to save here. Try a smaller ratio.';
+      return 'Could not save the file here. Open BloomType on its own site to download it.'; }
   }
+  if (window.claude) return 'Saving is not available in this view. Open BloomType on its own site to download it.';   // a plain download link is blocked inside Claude
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 5000);
   return 'Saved '+name;
@@ -1202,7 +1217,7 @@ function runtimeSource(){
   const t = transparentOn();
   return `function mountBloomType(host){
 ${engineSource()}
-Object.assign(S, ${JSON.stringify(embedConfig())});
+Object.assign(S, ${JSON.stringify(embedConfig()).replace(/</g, '\\u003c')});
 fontsReady = true;
 var cv = document.createElement('canvas'); cv.setAttribute('aria-hidden', 'true'); cv.style.cssText = 'display:block;width:100%;height:100%';
 host.appendChild(cv);
@@ -1222,16 +1237,18 @@ var fallback = setTimeout(start, 4000);
 return function(){ clearTimeout(fallback); cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); cv.remove(); };
 }`;
 }
-function describe(){ return `"${S.word}" · ${STY().name} · ${FNT().name} · ${MOT().name} · ${PAL().name}`; }
+const escHtml = t => t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+function describe(){ return `"${S.word.replace(/[<>]/g,'').replace(/\n/g,' / ')}" · ${STY().name} · ${FNT().name} · ${MOT().name} · ${PAL().name}`; }
 function aspectCss(){ const [W,H] = exportDims(); return `${W} / ${H}`; }
 function htmlSnippet(){
-  const id = 'bloomtype-' + (S.seed % 1e6).toString(36), bg = transparentOn() ? 'transparent' : PAL().bg;
+  const bg = transparentOn() ? 'transparent' : PAL().bg;
   return `<!-- BloomType poster: ${describe()} -->
-<div id="${id}" role="img" aria-label="${S.word.replace(/"/g,'&quot;')}" style="width:100%;aspect-ratio:${aspectCss()};background:${bg}"></div>
+<div role="img" aria-label="${escHtml(S.word)}" style="width:100%;aspect-ratio:${aspectCss()};background:${bg}"></div>
 <script>
 (function(){
+var host = document.currentScript.previousElementSibling;   // each embed draws into the box right before it
 ${runtimeSource()}
-mountBloomType(document.getElementById('${id}'));
+mountBloomType(host);
 })();
 <\/script>`;
 }
@@ -1248,7 +1265,7 @@ export default function BloomTypePoster({ className, style }) {
     <div
       ref={ref}
       role="img"
-      aria-label=${JSON.stringify(S.word)}
+      aria-label={${JSON.stringify(S.word)}}
       className={className}
       style={{ width: "100%", aspectRatio: "${aspectCss()}", background: "${bg}", ...style }}
     />
@@ -1284,11 +1301,11 @@ async function exportHTML(){
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${S.word.replace(/</g,'&lt;')}</title>
+<title>${escHtml(S.word.replace(/\n/g,' '))}</title>
 <style>html,body{margin:0;height:100%;background:${bg}}#bloomtype{width:100%;height:100%}</style>
 </head>
 <body>
-<div id="bloomtype" role="img" aria-label="${S.word.replace(/"/g,'&quot;')}"></div>
+<div id="bloomtype" role="img" aria-label="${escHtml(S.word)}"></div>
 <script>
 (function(){
 ${runtimeSource()}
@@ -1311,7 +1328,7 @@ applyPalette(); sizeCanvas();
   const now = performance.now(); births = [...S.word].map((_,k)=> now + 200 + k*110);
   requestAnimationFrame((t) => { lastNow = tPrev = t; tick(t); });
 })();
-window.__bloom = { S, render, layout, regrow, setWord, exportDims, RATIOS, fieldCache, plantCache };
+window.__bloom = { S, render, layout, regrow, setWord, exportDims, RATIOS, fieldCache, plantCache, htmlSnippet, reactSnippet };   // used by test.html
 </script>
 </body>
 </html>
